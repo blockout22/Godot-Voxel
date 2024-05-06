@@ -11,24 +11,36 @@ public partial class VoxelWorld : Node
 
 	public FastNoiseLite noise;
 
+	public OrmMaterial3D material;
+
 	//Temp code
 	Vector3 lastGridPos = new Vector3(0, 0, 0);
+
+	 [Export(PropertyHint.ResourceType, "Script")]
+    public CSharpScript voxelGeneratorScript;
+	public GDScript g;
+
+	public VoxelGenerator voxelGenerator;
 
     public override void _Ready()
     {
         base._Ready();
+		voxelGenerator = voxelGeneratorScript.New().As<VoxelGenerator>();
+		// GD.Print(voxelGenerator);
+		if(voxelGenerator == null){
+			voxelGeneratorScript = new FlatTerrainGenerator();
+		// 	GD.Print("N~ULL");
+		}
+
+		GD.Print(voxelGenerator);
 
 		noise = new FastNoiseLite();
 		noise.Seed = (int)GD.Randi();
 		noise.FractalOctaves = 4;
 
-		// for (int x = -chunk_size; x < chunk_size / 2; x++){
-        //     for (int y = -chunk_size; y < chunk_size / 2; y++){
-        //         for (int z = -chunk_size; z < chunk_size / 2; z++){
-		// 			create_chunk(new Vector3(x, y, z));
-		// 		}
-		// 	}
-		// }
+		material = new OrmMaterial3D();
+		Texture2D atlas = ResourceLoader.Load<Texture2D>("res://Voxel/grass_16.png");
+		material.AlbedoTexture = atlas;
     }
 
 	public float GetNoiseValue(float x, float z)
@@ -41,13 +53,13 @@ public partial class VoxelWorld : Node
         base._Process(delta);
 
 		Vector3 controllerPos = GetViewport().GetCamera3D().GlobalPosition;
-		Vector3 grid_position = new Vector3(MathF.Floor(controllerPos.X / chunk_size), MathF.Floor(controllerPos.Y / chunk_size), MathF.Floor(controllerPos.Z / chunk_size));
+		Vector3I grid_position = new Vector3I((int)MathF.Floor(controllerPos.X / chunk_size), (int)MathF.Floor(controllerPos.Y / chunk_size), (int)MathF.Floor(controllerPos.Z / chunk_size));
 
 		if(grid_position != lastGridPos){
 			for(int x = -2; x < 3; x++){
 				for(int y = -1; y < 2; y++){
 					for(int z = -2; z < 3; z++){
-						Vector3 chunk_position = new Vector3(x, y, z) + grid_position;
+						Vector3I chunk_position = new Vector3I(x, y, z) + grid_position;
 						if(!chunks.ContainsKey(chunk_position)){
 							create_chunk(chunk_position);
 						}
@@ -58,20 +70,21 @@ public partial class VoxelWorld : Node
 		}
     }
 
-	private void create_chunk(Vector3 grid_position){
+	private void create_chunk(Vector3I grid_position){
 		if (chunks.ContainsKey(grid_position)){
 			GD.Print(grid_position + " Already Exists");
 			return;
 		}
 
 		VoxelChunk chunk = new VoxelChunk(this, grid_position);
+		chunk.material = material;
 		chunks.Add(grid_position,chunk);
 
 		//Create and add instance to world
-		MeshInstance3D instance = chunk.generate();
+		MeshInstance3D instance = chunk.generate(voxelGenerator);
 		if (instance != null){
 			AddChild(instance);
 		}
-		GD.Print("Created chunk at: " + grid_position);
+		// GD.Print("Created chunk at: " + grid_position);
 	}
 }

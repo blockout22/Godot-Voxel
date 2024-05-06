@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class VoxelBuilder : Node
+public partial class VoxelBuilder
 {
 
     public VoxelWorld voxelWorld;
@@ -39,7 +39,7 @@ public partial class VoxelBuilder : Node
         voxelWorld = _voxelWorld;
     }
 
-    public MeshInstance3D build(bool[,,] blockList){
+    public MeshInstance3D build(VoxelBlock[,,] blockList){
         surfaceTool = new SurfaceTool();
         vertexCount = 0;
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
@@ -47,14 +47,14 @@ public partial class VoxelBuilder : Node
         for (int x = 0; x < blockList.GetLength(0); x++){
             for (int y = 0; y < blockList.GetLength(1); y++){
                 for (int z = 0; z < blockList.GetLength(2); z++){
-                    bool block = blockList[x, y, z];
-                    if (block){
+                    VoxelBlock block = blockList[x, y, z];
+                    if (block != null){
                         object[] neighbors = getNeighbors(blockList, x, y, z);
 
                         float uv_offset_x = 0;
                         float uv_offset_y = 0;
-                        float uv_grid_size_x = 2.0f;
-                        float uv_grid_size_y = 2.0f;
+                        float uv_grid_size_x = 1.0f;
+                        float uv_grid_size_y = 1.0f;
 
                         Vector2[] faceUVs = {
                             new Vector2(uv_offset_x, uv_offset_y),
@@ -80,7 +80,7 @@ public partial class VoxelBuilder : Node
         return instance;
     }
 
-    private object[] getNeighbors(bool[,,] blockList, int x, int y, int z){
+    private object[] getNeighbors(VoxelBlock[,,] blockList, int x, int y, int z){
         object[] neighbors = new object[6]{false, false, false, false, false, false};
         for (int i = 0; i < NEIGHBOR_OFFSETS.GetLength(0); i++){
             Vector3I offset = NEIGHBOR_OFFSETS[i];
@@ -113,7 +113,7 @@ public partial class VoxelBuilder : Node
                 continue;
             }
 
-            if (blockList[neighbor_pos.X, neighbor_pos.Y, neighbor_pos.Z]){
+            if (blockList[neighbor_pos.X, neighbor_pos.Y, neighbor_pos.Z] != null){
                 neighbors[i] = neighbor_pos;
             }
         }

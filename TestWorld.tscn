@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://bme17a6ycy54r"]
+[gd_scene load_steps=7 format=3 uid="uid://bme17a6ycy54r"]
 
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelWorld.cs" id="1_sbti3"]
 [ext_resource type="Script" path="res://free_cam.gd" id="2_4ougg"]
+[ext_resource type="Script" path="res://Voxel/Scripts/HillsTerrainGenerator.cs" id="2_ujhy7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_a1dbe"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -27,6 +28,7 @@ shadow_enabled = true
 
 [node name="Node3D" type="Node3D" parent="."]
 script = ExtResource("1_sbti3")
+voxelGeneratorScript = ExtResource("2_ujhy7")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.954251, -0.147909, 0.25986, 0, 0.869082, 0.494668, -0.299006, -0.472038, 0.829323, 5.03924, 14.6997, 21.8783)
