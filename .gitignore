@@ -10,4 +10,8 @@ export_presets.cfg
 .mono/
 data_*/
 
+Voxel.csproj
+Voxel.sln
 .godot
+.vs
+.vscode
