@@ -74,9 +74,8 @@ public partial class VoxelBuilder : Node
             return null;
         }
 
-        GD.Print("Count: " + vertexCount);
-
         MeshInstance3D instance = new MeshInstance3D();
+        surfaceTool.GenerateNormals();
         instance.Mesh = surfaceTool.Commit();
         return instance;
     }

@@ -17,14 +17,13 @@ public partial class VoxelChunk
     public MeshInstance3D generate(){
         VoxelBuilder builder = new VoxelBuilder(voxelWorld);
 
-        drawBlocks();
+        drawTerrain();
 
         return build_mesh(builder);
     }
 
     private MeshInstance3D build_mesh(VoxelBuilder builder){
         MeshInstance3D instance = builder.build(blockList);
-        GD.Print("is my Mesh nbull?> " + instance);
         if (instance != null){
             instance.Position = new Vector3(chunk_position.X, chunk_position.Y, chunk_position.Z) * voxelWorld.chunk_size;
             instance.CreateTrimeshCollision();
@@ -32,6 +31,21 @@ public partial class VoxelChunk
         }
 
         return instance;
+    }
+
+    private void drawTerrain(){
+        for (int x = 0; x < voxelWorld.chunk_size; x++){
+            for (int y = 0; y < voxelWorld.chunk_size; y++){
+                for (int z = 0; z < voxelWorld.chunk_size; z++){
+                    Vector3 globalPosition = new Vector3(chunk_position.X * voxelWorld.chunk_size + x,
+                                                         chunk_position.Y * voxelWorld.chunk_size + y,
+                                                         chunk_position.Z * voxelWorld.chunk_size + z);
+                    
+                    float noiseHeight = voxelWorld.GetNoiseValue(globalPosition.X, globalPosition.Z) * voxelWorld.maxTerrainHeight;
+                    blockList[x, y, z] = globalPosition.Y <= noiseHeight;
+                }
+            }
+        }
     }
 
     private void drawBlocks(){
