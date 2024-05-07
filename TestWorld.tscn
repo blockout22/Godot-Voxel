@@ -1,8 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://bme17a6ycy54r"]
+[gd_scene load_steps=11 format=3 uid="uid://bme17a6ycy54r"]
 
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelWorld.cs" id="1_sbti3"]
 [ext_resource type="Script" path="res://free_cam.gd" id="2_4ougg"]
-[ext_resource type="Script" path="res://Voxel/Scripts/HillsTerrainGenerator.cs" id="2_ujhy7"]
+[ext_resource type="Script" path="res://Voxel/Scripts/FlatTerrainGenerator.cs" id="2_unl52"]
+[ext_resource type="Script" path="res://Voxel/Scripts/VoxelBlock.cs" id="2_wv2qy"]
+[ext_resource type="Texture2D" uid="uid://cp4khwj8rwn14" path="res://Voxel/sand.png" id="3_5i27v"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_a1dbe"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -17,18 +19,33 @@ sky = SubResource("Sky_02aur")
 tonemap_mode = 2
 glow_enabled = true
 
+[sub_resource type="Resource" id="Resource_ryxly"]
+script = ExtResource("2_wv2qy")
+name = "sand"
+description = ""
+texture = ExtResource("3_5i27v")
+
+[sub_resource type="Resource" id="Resource_rpurg"]
+script = ExtResource("2_unl52")
+MaxTerrainHeight = -25
+
 [node name="Node3D" type="Node3D"]
+
+[node name="Node3D2" type="Node3D" parent="."]
+transform = Transform3D(1, -1.49012e-08, -2.98023e-08, 0, 1, 2.98023e-08, 1.49012e-08, 0, 1, 9.53674e-07, 9.53674e-07, 1.90735e-06)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_sglkv")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+transform = Transform3D(-0.851316, -0.352377, 0.388704, 0.524265, -0.542892, 0.656059, -0.0201554, 0.762298, 0.646913, 0, 0, 0)
 shadow_enabled = true
 
 [node name="Node3D" type="Node3D" parent="."]
 script = ExtResource("1_sbti3")
-voxelGeneratorScript = ExtResource("2_ujhy7")
+registeredBlocks = Array[Object]([SubResource("Resource_ryxly")])
+texture2D = ExtResource("3_5i27v")
+voxelGenerator = SubResource("Resource_rpurg")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.954251, -0.147909, 0.25986, 0, 0.869082, 0.494668, -0.299006, -0.472038, 0.829323, 5.03924, 14.6997, 21.8783)

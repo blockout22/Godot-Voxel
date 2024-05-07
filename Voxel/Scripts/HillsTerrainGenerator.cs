@@ -1,6 +1,7 @@
 using Godot;
 using System;
 
+[GlobalClass]
 public partial class HillsTerrainGenerator : VoxelGenerator
 {
     public override VoxelBlock[,,] build(VoxelWorld voxelWorld, Vector3I chunkPosition)
@@ -15,7 +16,13 @@ public partial class HillsTerrainGenerator : VoxelGenerator
                                                          chunkPosition.Z * size + z);
                     
                     float noiseHeight = voxelWorld.GetNoiseValue(globalPosition.X, globalPosition.Z) * voxelWorld.maxTerrainHeight;
-                    blockList[x, y, z] = (globalPosition.Y <= noiseHeight ? new VoxelBlock() : null);
+                    VoxelBlock voxelBlock = null;
+
+                    if (GD.Randf() < 0.1f){
+                        voxelBlock = ((VoxelBlock)voxelWorld.findRegisteredBlockByName("sand"));
+                    }
+
+                    blockList[x, y, z] = (globalPosition.Y <= noiseHeight ? voxelBlock : null);
                 }
             }
         }

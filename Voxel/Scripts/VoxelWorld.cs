@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class VoxelWorld : Node
 {
@@ -16,32 +17,45 @@ public partial class VoxelWorld : Node
 	//Temp code
 	Vector3 lastGridPos = new Vector3(0, 0, 0);
 
-	 [Export(PropertyHint.ResourceType, "Script")]
-    public CSharpScript voxelGeneratorScript;
-	public GDScript g;
+	[Export]
+	public VoxelBlock[] registeredBlocks;
+	// public VoxelBlock[] registeredBlocksInstances;
+
+	[Export]
+	public Texture2D texture2D;
+
+	 [Export]
+    // public CSharpScript voxelGeneratorScript;
 
 	public VoxelGenerator voxelGenerator;
 
     public override void _Ready()
     {
         base._Ready();
-		voxelGenerator = voxelGeneratorScript.New().As<VoxelGenerator>();
+
+
+		material = new OrmMaterial3D();
+		GD.Print(((VoxelBlock)registeredBlocks[0]).name);
+		Texture2D atlas = ((VoxelBlock)registeredBlocks[0]).texture;
+		material.AlbedoTexture = atlas;
+
+		// voxelGenerator = voxelGeneratorScript.New().As<VoxelGenerator>();
 		// GD.Print(voxelGenerator);
 		if(voxelGenerator == null){
-			voxelGeneratorScript = new FlatTerrainGenerator();
+			voxelGenerator = new FlatTerrainGenerator();
 		// 	GD.Print("N~ULL");
 		}
 
-		GD.Print(voxelGenerator);
+		// GD.Print(voxelGenerator);
 
 		noise = new FastNoiseLite();
 		noise.Seed = (int)GD.Randi();
-		noise.FractalOctaves = 4;
-
-		material = new OrmMaterial3D();
-		Texture2D atlas = ResourceLoader.Load<Texture2D>("res://Voxel/grass_16.png");
-		material.AlbedoTexture = atlas;
+		// noise.FractalOctaves = 4;
     }
+
+	public VoxelBlock findRegisteredBlockByName(string name){
+		return registeredBlocks.FirstOrDefault(block => block != null && block.name == name);
+	}
 
 	public float GetNoiseValue(float x, float z)
     {

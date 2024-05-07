@@ -1,10 +1,12 @@
 using Godot;
 using System;
 
+[GlobalClass]
 public partial class FlatTerrainGenerator : VoxelGenerator
 {
 
-    private const int TerrainHeight = 5;
+    [Export]
+    private int MaxTerrainHeight = 5;
 
     public override VoxelBlock[,,] build(VoxelWorld voxelWorld, Vector3I chunkPosition){
         int size = voxelWorld.chunk_size;
@@ -23,9 +25,9 @@ public partial class FlatTerrainGenerator : VoxelGenerator
                     );
 
                     // Example rule: Simple flat terrain generation
-                    if (globalPosition.Y < TerrainHeight)
+                    if (globalPosition.Y < MaxTerrainHeight)
                     {
-                        blockList[x, y, z] = new VoxelBlock();
+                        blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[0];
                     }
                 }
             }

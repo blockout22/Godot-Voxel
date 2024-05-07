@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cundeq6yhm7h5"
-path="res://.godot/imported/grass_16.png-1b868fb22eab0c3ca6bea8ae2ee9d38f.ctex"
+uid="uid://cp4khwj8rwn14"
+path="res://.godot/imported/sand.png-6c17b428e2d53fee6af21387f656b7fa.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Voxel/grass_16.png"
-dest_files=["res://.godot/imported/grass_16.png-1b868fb22eab0c3ca6bea8ae2ee9d38f.ctex"]
+source_file="res://Voxel/sand.png"
+dest_files=["res://.godot/imported/sand.png-6c17b428e2d53fee6af21387f656b7fa.ctex"]
 
 [params]
 
