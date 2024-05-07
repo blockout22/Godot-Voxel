@@ -3,11 +3,14 @@ using System;
 
 public partial class VoxelChunk
 {
+    public MeshInstance3D instance;
     public VoxelWorld voxelWorld;
-    Vector3I chunk_position;
+    public Vector3I chunk_position;
     public BaseMaterial3D material;
 
     VoxelBlock[,,] blockList;
+
+    VoxelBuilder builder;
 
     public VoxelChunk(VoxelWorld _voxelWorld, Vector3I _grid_position){
         voxelWorld = _voxelWorld;
@@ -16,16 +19,16 @@ public partial class VoxelChunk
     }
 
     public MeshInstance3D generate(VoxelGenerator voxelGenerator){
-        VoxelBuilder builder = new VoxelBuilder(voxelWorld);
+        builder = new VoxelBuilder(voxelWorld);
 
         // drawTerrain();
         blockList = voxelGenerator.build(voxelWorld, chunk_position);
 
-        return build_mesh(builder);
+        return build_mesh();
     }
 
-    private MeshInstance3D build_mesh(VoxelBuilder builder){
-        MeshInstance3D instance = builder.build(blockList);
+    public MeshInstance3D build_mesh(){
+        instance = builder.build(blockList);
         if (instance != null){
             instance.Position = new Vector3(chunk_position.X, chunk_position.Y, chunk_position.Z) * voxelWorld.chunk_size;
             instance.CreateTrimeshCollision();
@@ -33,6 +36,19 @@ public partial class VoxelChunk
         }
 
         return instance;
+    }
+
+    public bool removeBlockAt(int x, int y, int z){
+        // if (blockList[x, y, z] != null){
+        //     blockList[x, y, z] = null;
+        //     return true;
+        // }
+
+        return false;
+    }
+
+    public VoxelBlock getBlockAt(int x, int y, int z){
+        return blockList[x, y, z];
     }
 
     // private void drawTerrain(){

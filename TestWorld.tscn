@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelWorld.cs" id="1_sbti3"]
 [ext_resource type="Script" path="res://free_cam.gd" id="2_4ougg"]
 [ext_resource type="Texture2D" uid="uid://cundeq6yhm7h5" path="res://Voxel/grass_16.png" id="2_ilbls"]
-[ext_resource type="Script" path="res://Voxel/Scripts/HillsTerrainGenerator.cs" id="2_ujhy7"]
+[ext_resource type="Script" path="res://Voxel/Scripts/FlatTerrainGenerator.cs" id="2_unl52"]
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelBlock.cs" id="2_wv2qy"]
 [ext_resource type="Texture2D" uid="uid://cp4khwj8rwn14" path="res://Voxel/sand.png" id="3_5i27v"]
 
@@ -32,8 +32,9 @@ name = "sand"
 description = ""
 texture = ExtResource("3_5i27v")
 
-[sub_resource type="Resource" id="Resource_1um17"]
-script = ExtResource("2_ujhy7")
+[sub_resource type="Resource" id="Resource_wji1q"]
+script = ExtResource("2_unl52")
+MaxTerrainHeight = 1
 
 [node name="Node3D" type="Node3D"]
 
@@ -50,7 +51,7 @@ shadow_enabled = true
 [node name="Node3D" type="Node3D" parent="."]
 script = ExtResource("1_sbti3")
 registeredBlocks = Array[Object]([SubResource("Resource_s0v83"), SubResource("Resource_opjx8")])
-voxelGenerator = SubResource("Resource_1um17")
+voxelGenerator = SubResource("Resource_wji1q")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.954251, -0.147909, 0.25986, 0, 0.869082, 0.494668, -0.299006, -0.472038, 0.829323, 5.03924, 14.6997, 21.8783)

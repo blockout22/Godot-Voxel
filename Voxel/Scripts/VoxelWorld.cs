@@ -29,6 +29,9 @@ public partial class VoxelWorld : Node
 
 	public VoxelGenerator voxelGenerator;
 
+	private Texture2D textureAtlas;
+	public List<Rect2> textureCoordinates = new List<Rect2>();
+
     public override void _Ready()
     {
         base._Ready();
@@ -52,12 +55,50 @@ public partial class VoxelWorld : Node
 		noise = new FastNoiseLite();
 		noise.Seed = (int)GD.Randi();
 		// noise.FractalOctaves = 4;
+
+		//Test Code
+		create_chunk(new Vector3I(0, 0, 0));
+		
+		VoxelChunk chunk = getVoxelChunkAt(0, 0, 0);
+		chunk.removeBlockAt(5, 0, 5);
+		Vector3I gridPosition = chunk.chunk_position;
+		regenChunk(chunk);
     }
 
-	private Texture2D textureAtlas;
-	public List<Rect2> textureCoordinates = new List<Rect2>();
+	// takes in global world coords and returns the chunk 
+	public VoxelChunk getVoxelChunkAt(int x, int y, int z){
+		Vector3I chunk_pos = new Vector3I(x / chunk_size, y / chunk_size, z / chunk_size);
 
-	private void createAtlas(){
+		if (chunks.ContainsKey(chunk_pos)){
+			return chunks[chunk_pos];
+		}
+
+		return null;
+	}
+
+	public VoxelBlock getVoxelBlockAt(int x, int y, int z){
+		VoxelChunk chunk = getVoxelChunkAt(x, y, z);
+
+		GD.Print("Chbuink pos: " + chunk.chunk_position);
+		
+
+		if(chunk != null){
+			int localX = ((x % chunk_size) + chunk_size) % chunk_size;
+			int localY = ((y % chunk_size) + chunk_size) % chunk_size;
+			int localZ = ((z % chunk_size) + chunk_size) % chunk_size;
+
+			VoxelBlock voxelBlock = chunk.getBlockAt(localX, localY, localZ);
+			return voxelBlock;	
+		}
+
+		return null;
+	}
+
+    // private int mod(){
+    // 	return ((val % div) + div) % div;
+    // }
+
+    private void createAtlas(){
 
 		int padding = 2;
 		int totalArea = 0;
@@ -170,6 +211,13 @@ public partial class VoxelWorld : Node
 			lastGridPos = grid_position;
 		}
     }
+
+	private void regenChunk(VoxelChunk chunk){
+		RemoveChild(chunk.instance);
+		MeshInstance3D instance = chunk.build_mesh();
+
+		AddChild(instance);
+	}
 
 	private void create_chunk(Vector3I grid_position){
 		if (chunks.ContainsKey(grid_position)){
