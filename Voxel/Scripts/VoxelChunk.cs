@@ -39,10 +39,10 @@ public partial class VoxelChunk
     }
 
     public bool removeBlockAt(int x, int y, int z){
-        // if (blockList[x, y, z] != null){
-        //     blockList[x, y, z] = null;
-        //     return true;
-        // }
+        if (blockList[x, y, z] != null){
+            blockList[x, y, z] = null;
+            return true;
+        }
 
         return false;
     }

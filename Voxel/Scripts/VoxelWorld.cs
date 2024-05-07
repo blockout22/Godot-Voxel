@@ -57,12 +57,12 @@ public partial class VoxelWorld : Node
 		// noise.FractalOctaves = 4;
 
 		//Test Code
-		create_chunk(new Vector3I(0, 0, 0));
+		// create_chunk(new Vector3I(0, 0, 0));
 		
-		VoxelChunk chunk = getVoxelChunkAt(0, 0, 0);
-		chunk.removeBlockAt(5, 0, 5);
-		Vector3I gridPosition = chunk.chunk_position;
-		regenChunk(chunk);
+		// VoxelChunk chunk = getVoxelChunkAt(0, 0, 0);
+		// chunk.removeBlockAt(5, 0, 5);
+		// Vector3I gridPosition = chunk.chunk_position;
+		// regenChunk(chunk);
     }
 
 	// takes in global world coords and returns the chunk 
