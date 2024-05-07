@@ -21,8 +21,8 @@ public partial class VoxelWorld : Node
 	public VoxelBlock[] registeredBlocks;
 	// public VoxelBlock[] registeredBlocksInstances;
 
-	[Export]
-	public Texture2D texture2D;
+	// [Export]
+	// public Texture2D texture2D;
 
 	 [Export]
     // public CSharpScript voxelGeneratorScript;
@@ -33,25 +33,112 @@ public partial class VoxelWorld : Node
     {
         base._Ready();
 
+		createAtlas();
 
-		material = new OrmMaterial3D();
-		GD.Print(((VoxelBlock)registeredBlocks[0]).name);
-		Texture2D atlas = ((VoxelBlock)registeredBlocks[0]).texture;
-		material.AlbedoTexture = atlas;
-
-		// voxelGenerator = voxelGeneratorScript.New().As<VoxelGenerator>();
-		// GD.Print(voxelGenerator);
-		if(voxelGenerator == null){
-			voxelGenerator = new FlatTerrainGenerator();
-		// 	GD.Print("N~ULL");
+		// assign uv coords to blocks
+		for (int i = 0; i < registeredBlocks.GetLength(0); i++){
+			((VoxelBlock)registeredBlocks[i]).uvCoodds = textureCoordinates[i];
 		}
 
-		// GD.Print(voxelGenerator);
+		//TODO Create texture atlas from all blocks
+		material = new OrmMaterial3D();
+		GD.Print(((VoxelBlock)registeredBlocks[0]).name);
+		Texture2D atlas = textureAtlas;
+		material.AlbedoTexture = atlas;
+		if(voxelGenerator == null){
+			voxelGenerator = new FlatTerrainGenerator();
+		}
 
 		noise = new FastNoiseLite();
 		noise.Seed = (int)GD.Randi();
 		// noise.FractalOctaves = 4;
     }
+
+	private Texture2D textureAtlas;
+	public List<Rect2> textureCoordinates = new List<Rect2>();
+
+	private void createAtlas(){
+
+		int padding = 2;
+		int totalArea = 0;
+		for(int j = 0; j < registeredBlocks.GetLength(0); j++)
+		{
+			Texture2D texture = ((VoxelBlock)registeredBlocks[j]).texture;
+			if (texture == null) continue;
+
+			totalArea += (texture.GetWidth()) * (texture.GetHeight());
+			GD.Print("Area " + totalArea);
+		}
+
+		float size = Mathf.Pow(2, Mathf.Ceil(Mathf.Log(Mathf.Sqrt(totalArea)) / Mathf.Log(2)));
+		//add padding
+		size = size + (registeredBlocks.GetLength(0) * padding);
+		// float calc = Mathf.Pow(2, Mathf.Ceil(Mathf.Log(Mathf.Sqrt(totalArea)) / Mathf.Log(2)));
+		// GD.Print("calc: " + (calc + (registeredBlocks.GetLength(0) * padding)));
+
+		GD.Print(size);
+		Image image = Image.Create((int)size, (int)size, false, Image.Format.Rgb8);
+		image.Fill(new Color(0, 0, 0, 0));
+
+		int x = 0;
+		int y = 0;
+		int maxHeightInRow = 0;
+
+		for(int i = 0; i < registeredBlocks.GetLength(0); i++){
+			Texture2D texture2d = ((VoxelBlock)registeredBlocks[i]).texture; 
+			Image texture = texture2d.GetImage();
+
+			if (texture == null){
+				continue;
+			}
+
+			int texWidth = texture.GetWidth();
+			int texHeight = texture.GetHeight();
+
+			if (x + texWidth + padding > size){
+				x = 0;
+				y += maxHeightInRow + padding;
+				maxHeightInRow = 0;
+			}
+
+			if (y + texHeight + padding > size){
+				GD.Print("Texture atlas to small");
+				break;
+			}
+				image.BlitRect(texture, new Rect2I(Vector2I.Zero, new Vector2I(texWidth, texHeight)), new Vector2I(x, y));
+				GD.Print(image + " : " + texWidth + " : " + x);
+				Rect2 texCoords = new Rect2((float)x / size, (float)y / size, (float)texWidth / size, (float)texHeight / size);
+           		textureCoordinates.Add(texCoords);
+
+				x += texWidth + padding;
+				maxHeightInRow = Mathf.Max(maxHeightInRow, texHeight);
+			}
+
+			image.GenerateMipmaps();
+			textureAtlas = ImageTexture.CreateFromImage(image);
+	}
+
+	 private int nextPowerOfTwo(int value)
+    {
+        value--;
+        value |= value >> 1;
+        value |= value >> 2;
+        value |= value >> 4;
+        value |= value >> 8;
+        value |= value >> 16;
+        value++;
+        return value;
+    }
+
+	// private void calculateAtlasSize(int numImages){
+	// 	int rows = (int) Mathf.Ceil(Mathf.Sqrt(numImages));
+	// 	int cols = rows;
+
+	// 	int maxImageDimension = 0;
+	// 	for(int i = 0; i < numImages; i++){
+	// 		int imageWidth = 
+	// 	}
+	// }
 
 	public VoxelBlock findRegisteredBlockByName(string name){
 		return registeredBlocks.FirstOrDefault(block => block != null && block.name == name);

@@ -20,6 +20,8 @@ public partial class HillsTerrainGenerator : VoxelGenerator
 
                     if (GD.Randf() < 0.1f){
                         voxelBlock = ((VoxelBlock)voxelWorld.findRegisteredBlockByName("sand"));
+                    }else{
+                        voxelBlock = ((VoxelBlock)voxelWorld.findRegisteredBlockByName("grass"));
                     }
 
                     blockList[x, y, z] = (globalPosition.Y <= noiseHeight ? voxelBlock : null);

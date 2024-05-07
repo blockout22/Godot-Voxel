@@ -27,7 +27,11 @@ public partial class FlatTerrainGenerator : VoxelGenerator
                     // Example rule: Simple flat terrain generation
                     if (globalPosition.Y < MaxTerrainHeight)
                     {
-                        blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[0];
+                        if(GD.Randf() < 0.5f){
+                            blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[0];
+                        }else{
+                             blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[1];
+                        }
                     }
                 }
             }

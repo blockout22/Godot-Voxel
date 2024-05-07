@@ -50,17 +50,17 @@ public partial class VoxelBuilder
                     VoxelBlock block = blockList[x, y, z];
                     if (block != null){
                         object[] neighbors = getNeighbors(blockList, x, y, z);
-
-                        float uv_offset_x = 0;
-                        float uv_offset_y = 0;
-                        float uv_grid_size_x = 1.0f;
-                        float uv_grid_size_y = 1.0f;
+                        Rect2 uvRect = block.uvCoodds;
+                        float uv_offset_x = uvRect.Position.X;
+                        float uv_offset_y = uvRect.Position.Y;
+                        float uv_grid_size_x = uvRect.Size.X;
+                        float uv_grid_size_y = uvRect.Size.Y;
 
                         Vector2[] faceUVs = {
                             new Vector2(uv_offset_x, uv_offset_y),
-                            new Vector2(uv_offset_x + (1.0f / uv_grid_size_x), uv_offset_y), 
-                            new Vector2(uv_offset_x + (1.0f / uv_grid_size_x), uv_offset_y + (1.0f / uv_grid_size_y)),
-                            new Vector2(uv_offset_x, uv_offset_y + (1.0f / uv_grid_size_y))
+                            new Vector2(uv_offset_x + (1.0f * uv_grid_size_x), uv_offset_y), 
+                            new Vector2(uv_offset_x + (1.0f * uv_grid_size_x), uv_offset_y + (1.0f * uv_grid_size_y)),
+                            new Vector2(uv_offset_x, uv_offset_y + (1.0f * uv_grid_size_y))
                         };
 
                         int mask = getNeighborsMask(neighbors);
@@ -75,7 +75,7 @@ public partial class VoxelBuilder
         }
 
         MeshInstance3D instance = new MeshInstance3D();
-        surfaceTool.GenerateNormals();
+        // surfaceTool.GenerateNormals();
         instance.Mesh = surfaceTool.Commit();
         return instance;
     }
