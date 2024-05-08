@@ -69,10 +69,11 @@ public partial class VoxelWorld : Node
 		// for(int x = -5; x < 5; x++){
 		// 	for(int y = -5; y < 5; y++){
 		// 		for(int z = -5; z < 5; z++){
-		// 			VoxelChunk chunk = new VoxelChunk(this, new Vector3I(x, y, z));
-		// 			chunk.generate(voxelGenerator);
+					VoxelChunk chunk = new VoxelChunk(this, new Vector3I(0, 0, 0));
+					chunk.generate(voxelGenerator);
 		// 			tempChunkStorage.Add(chunk);
-		// 			addChunk(chunk);
+					addChunk(chunk);
+					buildAndRenderChunk(chunk);
 		// 		}
 		// 	}
 		// }
