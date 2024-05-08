@@ -63,6 +63,25 @@ public partial class VoxelWorld : Node
 		// chunk.removeBlockAt(5, 0, 5);
 		// Vector3I gridPosition = chunk.chunk_position;
 		// regenChunk(chunk);
+
+		List<VoxelChunk> tempChunkStorage = new List<VoxelChunk>();
+		for(int x = -5; x < 5; x++){
+			for(int y = -5; y < 5; y++){
+				for(int z = -5; z < 5; z++){
+					VoxelChunk chunk = new VoxelChunk(this, new Vector3I(x, y, z));
+					chunk.generate(voxelGenerator);
+					tempChunkStorage.Add(chunk);
+					addChunk(chunk);
+				}
+			}
+		}
+
+		foreach(VoxelChunk chunk in tempChunkStorage){
+			buildAndRenderChunk(chunk);
+		}
+		// create_chunk(new Vector3I(0, -1, 0));
+		// create_chunk(new Vector3I(1, -1,  0));
+		// getVoxelChunkAtGrid(1, -1,  0);
     }
 
 	// takes in global world coords and returns the chunk 
@@ -70,17 +89,24 @@ public partial class VoxelWorld : Node
 		Vector3I chunk_pos = new Vector3I(x / chunk_size, y / chunk_size, z / chunk_size);
 
 		if (chunks.ContainsKey(chunk_pos)){
-			return chunks[chunk_pos];
+			VoxelChunk voxelChunk = chunks[chunk_pos];
+			return voxelChunk;
 		}
 
 		return null;
 	}
 
-	public VoxelBlock getVoxelBlockAt(int x, int y, int z){
-		VoxelChunk chunk = getVoxelChunkAt(x, y, z);
+	public VoxelChunk getVoxelChunkAtGrid(int x, int y, int z){
+		Vector3I chunk_pos = new Vector3I(x, y, z);
+		if (chunks.ContainsKey(chunk_pos)){
+			VoxelChunk voxelChunk = chunks[chunk_pos];
+			return voxelChunk;
+		}
+		return null;
+	}
 
-		GD.Print("Chbuink pos: " + chunk.chunk_position);
-		
+	public VoxelBlock getVoxelBlockAt(int x, int y, int z){
+		VoxelChunk chunk = getVoxelChunkAt(x, y, z);		
 
 		if(chunk != null){
 			int localX = ((x % chunk_size) + chunk_size) % chunk_size;
@@ -108,7 +134,6 @@ public partial class VoxelWorld : Node
 			if (texture == null) continue;
 
 			totalArea += (texture.GetWidth()) * (texture.GetHeight());
-			GD.Print("Area " + totalArea);
 		}
 
 		float size = Mathf.Pow(2, Mathf.Ceil(Mathf.Log(Mathf.Sqrt(totalArea)) / Mathf.Log(2)));
@@ -117,7 +142,6 @@ public partial class VoxelWorld : Node
 		// float calc = Mathf.Pow(2, Mathf.Ceil(Mathf.Log(Mathf.Sqrt(totalArea)) / Mathf.Log(2)));
 		// GD.Print("calc: " + (calc + (registeredBlocks.GetLength(0) * padding)));
 
-		GD.Print(size);
 		Image image = Image.Create((int)size, (int)size, false, Image.Format.Rgb8);
 		image.Fill(new Color(0, 0, 0, 0));
 
@@ -147,7 +171,6 @@ public partial class VoxelWorld : Node
 				break;
 			}
 				image.BlitRect(texture, new Rect2I(Vector2I.Zero, new Vector2I(texWidth, texHeight)), new Vector2I(x, y));
-				GD.Print(image + " : " + texWidth + " : " + x);
 				Rect2 texCoords = new Rect2((float)x / size, (float)y / size, (float)texWidth / size, (float)texHeight / size);
            		textureCoordinates.Add(texCoords);
 
@@ -203,7 +226,7 @@ public partial class VoxelWorld : Node
 					for(int z = -2; z < 3; z++){
 						Vector3I chunk_position = new Vector3I(x, y, z) + grid_position;
 						if(!chunks.ContainsKey(chunk_position)){
-							create_chunk(chunk_position);
+							// create_chunk(chunk_position);
 						}
 					}	
 				}
@@ -214,23 +237,26 @@ public partial class VoxelWorld : Node
 
 	private void regenChunk(VoxelChunk chunk){
 		RemoveChild(chunk.instance);
-		MeshInstance3D instance = chunk.build_mesh();
+		MeshInstance3D instance = chunk.buildMesh();
 
 		AddChild(instance);
 	}
 
-	private void create_chunk(Vector3I grid_position){
-		if (chunks.ContainsKey(grid_position)){
-			GD.Print(grid_position + " Already Exists");
+	private void addChunk(VoxelChunk _chunk){
+		if (chunks.ContainsKey(_chunk.chunk_position)){
+			GD.Print(_chunk.chunk_position + " Already Exists");
 			return;
 		}
 
-		VoxelChunk chunk = new VoxelChunk(this, grid_position);
-		chunk.material = material;
-		chunks.Add(grid_position,chunk);
+		// VoxelChunk chunk = new VoxelChunk(this, grid_position);
+		_chunk.material = material;
+		// chunk.chunk_position = new Vector3I(grid_position.X, grid_position.Y, grid_position.Z);
+		chunks.Add(_chunk.chunk_position, _chunk);
+	}
 
+	private void buildAndRenderChunk(VoxelChunk _chunk){
 		//Create and add instance to world
-		MeshInstance3D instance = chunk.generate(voxelGenerator);
+		MeshInstance3D instance = _chunk.buildMesh();
 		if (instance != null){
 			AddChild(instance);
 		}

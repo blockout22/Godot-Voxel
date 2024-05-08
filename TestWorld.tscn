@@ -1,11 +1,13 @@
-[gd_scene load_steps=13 format=3 uid="uid://bme17a6ycy54r"]
+[gd_scene load_steps=17 format=3 uid="uid://bme17a6ycy54r"]
 
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelWorld.cs" id="1_sbti3"]
 [ext_resource type="Script" path="res://free_cam.gd" id="2_4ougg"]
 [ext_resource type="Texture2D" uid="uid://cundeq6yhm7h5" path="res://Voxel/grass_16.png" id="2_ilbls"]
+[ext_resource type="Script" path="res://Voxel/Scripts/HillsTerrainGenerator.cs" id="2_ujhy7"]
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelBlock.cs" id="2_wv2qy"]
 [ext_resource type="Texture2D" uid="uid://cp4khwj8rwn14" path="res://Voxel/sand.png" id="3_5i27v"]
-[ext_resource type="Script" path="res://Voxel/Scripts/FloatingTerrainGenerator.cs" id="5_wdj63"]
+[ext_resource type="Texture2D" uid="uid://dp7pvbp0i6q6f" path="res://Voxel/water.jpg" id="5_qcrbx"]
+[ext_resource type="Texture2D" uid="uid://b2y4cxgwpvpwd" path="res://Voxel/brick.png" id="6_jmt6b"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_a1dbe"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -32,15 +34,20 @@ name = "sand"
 description = ""
 texture = ExtResource("3_5i27v")
 
-[sub_resource type="Resource" id="Resource_8gqaf"]
-script = ExtResource("5_wdj63")
-IslandRadius = 30
-IslandHeight = 20
-MinHeightAboveGround = 50
-MaxHeightAboveGround = 100
-IslandDensity = 0.05
-NoiseScale = 0.1
-NoiseFactor = 0.5
+[sub_resource type="Resource" id="Resource_ribpc"]
+script = ExtResource("2_wv2qy")
+name = "water"
+description = ""
+texture = ExtResource("5_qcrbx")
+
+[sub_resource type="Resource" id="Resource_b7hli"]
+script = ExtResource("2_wv2qy")
+name = "brick"
+description = ""
+texture = ExtResource("6_jmt6b")
+
+[sub_resource type="Resource" id="Resource_5d0qd"]
+script = ExtResource("2_ujhy7")
 
 [node name="Node3D" type="Node3D"]
 
@@ -56,8 +63,8 @@ shadow_enabled = true
 
 [node name="Node3D" type="Node3D" parent="."]
 script = ExtResource("1_sbti3")
-registeredBlocks = Array[Object]([SubResource("Resource_s0v83"), SubResource("Resource_opjx8")])
-voxelGenerator = SubResource("Resource_8gqaf")
+registeredBlocks = Array[Object]([SubResource("Resource_s0v83"), SubResource("Resource_opjx8"), SubResource("Resource_ribpc"), SubResource("Resource_b7hli")])
+voxelGenerator = SubResource("Resource_5d0qd")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(0.954251, -0.147909, 0.25986, 0, 0.869082, 0.494668, -0.299006, -0.472038, 0.829323, 5.03924, 14.6997, 21.8783)

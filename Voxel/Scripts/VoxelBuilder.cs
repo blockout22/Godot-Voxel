@@ -39,7 +39,8 @@ public partial class VoxelBuilder
         voxelWorld = _voxelWorld;
     }
 
-    public MeshInstance3D build(VoxelBlock[,,] blockList){
+    public MeshInstance3D build(VoxelChunk chunk){
+        VoxelBlock[,,] blockList = chunk.blockList;
         surfaceTool = new SurfaceTool();
         vertexCount = 0;
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
@@ -49,7 +50,7 @@ public partial class VoxelBuilder
                 for (int z = 0; z < blockList.GetLength(2); z++){
                     VoxelBlock block = blockList[x, y, z];
                     if (block != null){
-                        object[] neighbors = getNeighbors(blockList, x, y, z);
+                        object[] neighbors = getNeighbors(chunk, x, y, z);
                         Rect2 uvRect = block.uvCoodds;
                         float uv_offset_x = uvRect.Position.X;
                         float uv_offset_y = uvRect.Position.Y;
@@ -80,7 +81,8 @@ public partial class VoxelBuilder
         return instance;
     }
 
-    private object[] getNeighbors(VoxelBlock[,,] blockList, int x, int y, int z){
+    private object[] getNeighbors(VoxelChunk chunk, int x, int y, int z){
+        VoxelBlock[,,] blockList = chunk.blockList;
         object[] neighbors = new object[6]{false, false, false, false, false, false};
         for (int i = 0; i < NEIGHBOR_OFFSETS.GetLength(0); i++){
             Vector3I offset = NEIGHBOR_OFFSETS[i];
@@ -88,32 +90,87 @@ public partial class VoxelBuilder
 
             //TODO check neighboring chunks
             if (neighbor_pos.X < 0){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk.chunk_position.X - 1, chunk.chunk_position.Y, chunk.chunk_position.Z);
+                if (neighborChunk != null){
+                    Vector3I neighorBlockPos = new Vector3I(voxelWorld.chunk_size - 1, y, z);
+                    VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
+
+                    if (block != null){
+                        neighbors[i] = neighorBlockPos;
+                    }
+                }
                 continue;
             }
 
             if (neighbor_pos.Y < 0)
             {
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk.chunk_position.X, chunk.chunk_position.Y - 1, chunk.chunk_position.Z);
+                if (neighborChunk != null){
+                    Vector3I neighorBlockPos = new Vector3I(x, voxelWorld.chunk_size - 1, z);
+                    VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
+
+                    if (block != null){
+                        neighbors[i] = neighorBlockPos;
+                    }
+                }
                 continue;
             }
 
             if (neighbor_pos.Z < 0)
             {
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk.chunk_position.X, chunk.chunk_position.Y, chunk.chunk_position.Z - 1);
+                if (neighborChunk != null){
+                    Vector3I neighorBlockPos = new Vector3I(x, y, voxelWorld.chunk_size - 1);
+                    VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
+
+                    if (block != null){
+                        neighbors[i] = neighorBlockPos;
+                    }
+                }
                 continue;
             }
 
             if (neighbor_pos.X > voxelWorld.chunk_size - 1){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk.chunk_position.X + 1, chunk.chunk_position.Y, chunk.chunk_position.Z);
+                if (neighborChunk != null){
+                    Vector3I neighorBlockPos = new Vector3I(0, y, z);
+                    VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
+
+                    if (block != null){
+                        neighbors[i] = neighorBlockPos;
+                    }
+                }
                 continue;
             }
 
             if (neighbor_pos.Y > voxelWorld.chunk_size - 1){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk.chunk_position.X, chunk.chunk_position.Y + 1, chunk.chunk_position.Z);
+                if (neighborChunk != null){
+                    Vector3I neighorBlockPos = new Vector3I(x, 0, z);
+                    VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
+
+                    if (block != null){
+                        neighbors[i] = neighorBlockPos;
+                    }
+                }
                 continue;
             }
 
             if (neighbor_pos.Z > voxelWorld.chunk_size - 1){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk.chunk_position.X , chunk.chunk_position.Y, chunk.chunk_position.Z + 1);
+                if (neighborChunk != null){
+                    Vector3I neighorBlockPos = new Vector3I(x, y, 0);
+                    VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
+
+                    if (block != null){
+                        neighbors[i] = neighorBlockPos;
+                    }
+                }
                 continue;
             }
 
             if (blockList[neighbor_pos.X, neighbor_pos.Y, neighbor_pos.Z] != null){
+                //maybe change neighbor_pos to be the blocks global pos and not the chunks block local position
                 neighbors[i] = neighbor_pos;
             }
         }

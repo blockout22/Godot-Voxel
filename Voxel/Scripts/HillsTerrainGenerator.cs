@@ -18,10 +18,15 @@ public partial class HillsTerrainGenerator : VoxelGenerator
                     float noiseHeight = voxelWorld.GetNoiseValue(globalPosition.X, globalPosition.Z) * voxelWorld.maxTerrainHeight;
                     VoxelBlock voxelBlock = null;
 
-                    if (GD.Randf() < 0.1f){
-                        voxelBlock = ((VoxelBlock)voxelWorld.findRegisteredBlockByName("sand"));
+                    float rand = GD.Randf();
+                    if (rand < 0.1f){
+                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName("sand");
+                    }else if(rand < 0.4){
+                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName("grass");
+                    }else if(rand < 0.8){
+                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName("water");
                     }else{
-                        voxelBlock = ((VoxelBlock)voxelWorld.findRegisteredBlockByName("grass"));
+                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName("brick");
                     }
 
                     blockList[x, y, z] = (globalPosition.Y <= noiseHeight ? voxelBlock : null);

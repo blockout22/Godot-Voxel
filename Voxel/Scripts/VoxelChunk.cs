@@ -8,7 +8,7 @@ public partial class VoxelChunk
     public Vector3I chunk_position;
     public BaseMaterial3D material;
 
-    VoxelBlock[,,] blockList;
+    public VoxelBlock[,,] blockList;
 
     VoxelBuilder builder;
 
@@ -18,19 +18,20 @@ public partial class VoxelChunk
         blockList = new VoxelBlock[voxelWorld.chunk_size, voxelWorld.chunk_size, voxelWorld.chunk_size];
     }
 
-    public MeshInstance3D generate(VoxelGenerator voxelGenerator){
+    public void generate(VoxelGenerator voxelGenerator){
         builder = new VoxelBuilder(voxelWorld);
 
         // drawTerrain();
         blockList = voxelGenerator.build(voxelWorld, chunk_position);
 
-        return build_mesh();
+        // build_mesh();
     }
 
-    public MeshInstance3D build_mesh(){
-        instance = builder.build(blockList);
+    public MeshInstance3D buildMesh(){
+        instance = builder.build(this);
         if (instance != null){
             instance.Position = new Vector3(chunk_position.X, chunk_position.Y, chunk_position.Z) * voxelWorld.chunk_size;
+            // instance.Scale = new Vector3(0.8f, 0.8f, 0.8f);
             instance.CreateTrimeshCollision();
             instance.Mesh.SurfaceSetMaterial(0, material);
         }
