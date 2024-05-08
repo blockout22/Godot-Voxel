@@ -45,7 +45,6 @@ public partial class VoxelWorld : Node
 
 		//TODO Create texture atlas from all blocks
 		material = new OrmMaterial3D();
-		GD.Print(((VoxelBlock)registeredBlocks[0]).name);
 		Texture2D atlas = textureAtlas;
 		material.AlbedoTexture = atlas;
 		if(voxelGenerator == null){
@@ -64,21 +63,26 @@ public partial class VoxelWorld : Node
 		// Vector3I gridPosition = chunk.chunk_position;
 		// regenChunk(chunk);
 
-		List<VoxelChunk> tempChunkStorage = new List<VoxelChunk>();
-		for(int x = -5; x < 5; x++){
-			for(int y = -5; y < 5; y++){
-				for(int z = -5; z < 5; z++){
-					VoxelChunk chunk = new VoxelChunk(this, new Vector3I(x, y, z));
-					chunk.generate(voxelGenerator);
-					tempChunkStorage.Add(chunk);
-					addChunk(chunk);
-				}
-			}
-		}
+		ulong startTime = Time.GetTicksMsec();
 
-		foreach(VoxelChunk chunk in tempChunkStorage){
-			buildAndRenderChunk(chunk);
-		}
+		// List<VoxelChunk> tempChunkStorage = new List<VoxelChunk>();
+		// for(int x = -5; x < 5; x++){
+		// 	for(int y = -5; y < 5; y++){
+		// 		for(int z = -5; z < 5; z++){
+		// 			VoxelChunk chunk = new VoxelChunk(this, new Vector3I(x, y, z));
+		// 			chunk.generate(voxelGenerator);
+		// 			tempChunkStorage.Add(chunk);
+		// 			addChunk(chunk);
+		// 		}
+		// 	}
+		// }
+
+		// foreach(VoxelChunk chunk in tempChunkStorage){
+		// 	buildAndRenderChunk(chunk);
+		// }
+
+		ulong endTime = Time.GetTicksMsec() - startTime;
+        GD.Print("Chunk Build time: " + endTime);
 		// create_chunk(new Vector3I(0, -1, 0));
 		// create_chunk(new Vector3I(1, -1,  0));
 		// getVoxelChunkAtGrid(1, -1,  0);
@@ -227,6 +231,11 @@ public partial class VoxelWorld : Node
 						Vector3I chunk_position = new Vector3I(x, y, z) + grid_position;
 						if(!chunks.ContainsKey(chunk_position)){
 							// create_chunk(chunk_position);
+
+							VoxelChunk chunk = new VoxelChunk(this, chunk_position);
+							chunk.generate(voxelGenerator);
+							addChunk(chunk);
+							buildAndRenderChunk(chunk);
 						}
 					}	
 				}

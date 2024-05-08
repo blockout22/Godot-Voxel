@@ -17,3 +17,14 @@ config/features=PackedStringArray("4.3", "C#", "Forward Plus")
 [dotnet]
 
 project/assembly_name="Voxel"
+
+[importer_defaults]
+
+texture={
+"compress/mode": 3,
+"detect_3d/compress_to": 0
+}
+
+[rendering]
+
+textures/lossless_compression/force_png=true
