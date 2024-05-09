@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class VoxelBuilder
 {
@@ -65,6 +66,15 @@ public partial class VoxelBuilder
                         };
 
                         int mask = getNeighborsMask(neighbors);
+
+                        // object[] testMask = new object[6]{false, 1, false, false, false, false};
+                        // int test = getNeighborsMask(testMask);
+                        // string toPint = "";
+                        // for (int i = 0; i < neighbors.GetLength(0); i++){
+                            // toPint += (neighbors[i] is bool ? "false" : "true") + " ";
+                        // }
+                        // GD.Print(mask + " : " +  getNeighborsMask(testMask));
+
                         drawFromMask(mask, x, y, z, faceUVs);
                     }
                 }
@@ -170,6 +180,7 @@ public partial class VoxelBuilder
             }
 
             if (blockList[neighbor_pos.X, neighbor_pos.Y, neighbor_pos.Z] != null){
+                // GD.Print("Neightpos: " + NEIGHBOR_OFFSETS[i].Y );
                 //maybe change neighbor_pos to be the blocks global pos and not the chunks block local position
                 neighbors[i] = neighbor_pos;
             }
@@ -189,12 +200,20 @@ public partial class VoxelBuilder
     }
 
     private void drawFromMask(int mask, int x, int y, int z, Vector2[] uvs){
+            Mesh mesh = voxelWorld.MASK[mask];
+            if(mesh != null){
+                Dictionary<string, object> data = voxelWorld.extractMeshData(mesh);
+                draw((Vector3[])data["vertices"], (int[])data["indices"], new Vector3(x, y, z), (Vector2[])data["uvs"]);
+                return;
+            }
+
         if ((mask & 1 << 0) == 0){
             FACES.TryGetValue("left", out Vector3[] verts);
             draw(verts, CUBE_INDICES, new Vector3(x, y, z), uvs);
         }
 
         if ((mask & 1 << 1) == 0){
+            // GD.Print("Bottom: " + mask);
             FACES.TryGetValue("bottom", out Vector3[] verts);
             draw(verts, CUBE_INDICES, new Vector3(x, y, z), uvs);
         }

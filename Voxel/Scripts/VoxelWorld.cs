@@ -24,10 +24,14 @@ public partial class VoxelWorld : Node
 	// [Export]
 	// public Texture2D texture2D;
 
-	 [Export]
     // public CSharpScript voxelGeneratorScript;
 
+	[Export]
 	public VoxelGenerator voxelGenerator;
+	[Export]
+	public Mesh[] MASK = new Mesh[64];
+	
+	private readonly Dictionary<Mesh, Dictionary<string, object>> meshCache = new Dictionary<Mesh, Dictionary<string, object>>();
 
 	private Texture2D textureAtlas;
 	public List<Rect2> textureCoordinates = new List<Rect2>();
@@ -186,6 +190,75 @@ public partial class VoxelWorld : Node
 			image.GenerateMipmaps();
 			textureAtlas = ImageTexture.CreateFromImage(image);
 	}
+
+	public Dictionary<string, object> extractMeshData(Mesh mesh)
+    {
+		// Check if the mesh data is already cached
+        if (meshCache.TryGetValue(mesh, out Dictionary<string, object> cachedData))
+        {
+            return cachedData;
+        }
+
+        var dataDict = new Dictionary<string, object>();
+
+        if (mesh is Mesh)
+        {
+            int surfaceCount = mesh.GetSurfaceCount();
+            List<Vector3> verticesList = new List<Vector3>();
+            List<Vector3> normalsList = new List<Vector3>();
+            List<int> indicesList = new List<int>();
+            List<Vector2> uvsList = new List<Vector2>();
+
+            int indexOffset = 0;
+
+            for (int i = 0; i < surfaceCount; i++)
+            {
+                Godot.Collections.Array arrays = mesh.SurfaceGetArrays(i);
+                Vector3[] vertices = (Vector3[])arrays[(int)Mesh.ArrayType.Vertex];
+                Vector3[] normals = (Vector3[])arrays[(int)Mesh.ArrayType.Normal];
+                int[] indices = (int[])arrays[(int)Mesh.ArrayType.Index];
+
+                // Add vertices and normals to the respective lists
+                verticesList.AddRange(vertices ?? new Vector3[0]);
+                normalsList.AddRange(normals ?? new Vector3[0]);
+
+                // Adjust the indices based on the current offset
+                if (indices != null)
+                {
+                    for (int j = 0; j < indices.Length; j++)
+                    {
+                        indicesList.Add(indices[j] + indexOffset);
+                    }
+                }
+
+                indexOffset += vertices?.Length ?? 0;
+
+                // Handle UV data
+                if (arrays.Count > (int)Mesh.ArrayType.TexUV)
+                {
+                    Vector2[] uvs = (Vector2[])arrays[(int)Mesh.ArrayType.TexUV];
+                    uvsList.AddRange(uvs ?? new Vector2[0]);
+                }
+            }
+
+            dataDict["vertices"] = verticesList.ToArray();
+            dataDict["normals"] = normalsList.ToArray();
+            dataDict["indices"] = indicesList.ToArray();
+            dataDict["uvs"] = uvsList.ToArray();
+        }
+        else
+        {
+            dataDict["vertices"] = new Vector3[0];
+            dataDict["normals"] = new Vector3[0];
+            dataDict["indices"] = new int[0];
+            dataDict["uvs"] = new Vector2[0];
+        }
+
+		// Cache the extracted data
+        meshCache[mesh] = dataDict;
+
+        return dataDict;
+    }
 
 	 private int nextPowerOfTwo(int value)
     {
