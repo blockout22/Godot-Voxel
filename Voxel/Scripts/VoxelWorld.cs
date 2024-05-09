@@ -14,6 +14,11 @@ public partial class VoxelWorld : Node
 
 	public OrmMaterial3D material;
 
+	private readonly Dictionary<Mesh, Dictionary<string, object>> meshCache = new Dictionary<Mesh, Dictionary<string, object>>();
+
+	private Texture2D textureAtlas;
+	public List<Rect2> textureCoordinates = new List<Rect2>();
+
 	//Temp code
 	Vector3 lastGridPos = new Vector3(0, 0, 0);
 
@@ -30,11 +35,6 @@ public partial class VoxelWorld : Node
 	public VoxelGenerator voxelGenerator;
 	[Export]
 	public Mesh[] MASK = new Mesh[64];
-	
-	private readonly Dictionary<Mesh, Dictionary<string, object>> meshCache = new Dictionary<Mesh, Dictionary<string, object>>();
-
-	private Texture2D textureAtlas;
-	public List<Rect2> textureCoordinates = new List<Rect2>();
 
     public override void _Ready()
     {

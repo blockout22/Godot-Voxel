@@ -199,11 +199,30 @@ public partial class VoxelBuilder
         return mask;
     }
 
+    private Vector2[] applyUVAdjustment(Vector2[] originalUVs, Vector2[] faceUVs)
+    {
+        Vector2 uvOffset = faceUVs[0];
+        Vector2 uvScale = new Vector2(faceUVs[1].X - faceUVs[0].X, faceUVs[2].Y - faceUVs[0].Y);
+
+        Vector2[] adjustedUVs = new Vector2[originalUVs.Length];
+
+        for (int i = 0; i < originalUVs.Length; i++)
+        {
+            adjustedUVs[i] = uvOffset + new Vector2(
+                originalUVs[i].X * uvScale.X,
+                originalUVs[i].Y * uvScale.Y
+            );
+        }
+
+        return adjustedUVs;
+    }
+
     private void drawFromMask(int mask, int x, int y, int z, Vector2[] uvs){
             Mesh mesh = voxelWorld.MASK[mask];
             if(mesh != null){
                 Dictionary<string, object> data = voxelWorld.extractMeshData(mesh);
-                draw((Vector3[])data["vertices"], (int[])data["indices"], new Vector3(x, y, z), (Vector2[])data["uvs"]);
+                 Vector2[] adjustedUVs = applyUVAdjustment((Vector2[])data["uvs"], uvs);
+                draw((Vector3[])data["vertices"], (int[])data["indices"], new Vector3(x, y, z), adjustedUVs);
                 return;
             }
 
@@ -213,7 +232,6 @@ public partial class VoxelBuilder
         }
 
         if ((mask & 1 << 1) == 0){
-            // GD.Print("Bottom: " + mask);
             FACES.TryGetValue("bottom", out Vector3[] verts);
             draw(verts, CUBE_INDICES, new Vector3(x, y, z), uvs);
         }

@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://Voxel/Scripts/HillsTerrainGenerator.cs" id="2_ujhy7"]
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelBlock.cs" id="2_wv2qy"]
 [ext_resource type="Texture2D" uid="uid://cp4khwj8rwn14" path="res://Voxel/sand.png" id="3_5i27v"]
-[ext_resource type="ArrayMesh" uid="uid://rnpxu4jwsry4" path="res://Voxel/mound.obj" id="5_mflvs"]
+[ext_resource type="ArrayMesh" uid="uid://dqbveaqshhl5n" path="res://Voxel/mound.obj" id="5_mflvs"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_a1dbe"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -33,7 +33,7 @@ name = "grass"
 description = ""
 texture = ExtResource("3_5i27v")
 
-[sub_resource type="Resource" id="Resource_e4oxr"]
+[sub_resource type="Resource" id="Resource_guj22"]
 script = ExtResource("2_ujhy7")
 
 [node name="Node3D" type="Node3D"]
@@ -51,7 +51,7 @@ shadow_enabled = true
 [node name="VoxelTerrain" type="Node3D" parent="."]
 script = ExtResource("1_sbti3")
 registeredBlocks = Array[Object]([SubResource("Resource_vipnt"), SubResource("Resource_fn3vy")])
-voxelGenerator = SubResource("Resource_e4oxr")
+voxelGenerator = SubResource("Resource_guj22")
 MASK = [null, null, ExtResource("5_mflvs"), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
 
 [node name="Camera3D" type="Camera3D" parent="."]
