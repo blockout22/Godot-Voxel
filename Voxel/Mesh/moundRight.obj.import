@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://1y5wp24kihvd"
+path="res://.godot/imported/moundRight.obj-ca219a90d426d82aac1d76861cd5852e.mesh"
+
+[deps]
+
+files=["res://.godot/imported/moundRight.obj-ca219a90d426d82aac1d76861cd5852e.mesh"]
+
+source_file="res://Voxel/Mesh/moundRight.obj"
+dest_files=["res://.godot/imported/moundRight.obj-ca219a90d426d82aac1d76861cd5852e.mesh", "res://.godot/imported/moundRight.obj-ca219a90d426d82aac1d76861cd5852e.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

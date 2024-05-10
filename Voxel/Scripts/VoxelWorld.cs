@@ -95,10 +95,13 @@ public partial class VoxelWorld : Node
 
 	// takes in global world coords and returns the chunk 
 	public VoxelChunk getVoxelChunkAt(int x, int y, int z){
-		Vector3I chunk_pos = new Vector3I(x / chunk_size, y / chunk_size, z / chunk_size);
-
-		if (chunks.ContainsKey(chunk_pos)){
-			VoxelChunk voxelChunk = chunks[chunk_pos];
+		Vector3I chunkPos = new Vector3I(
+        Mathf.FloorToInt((float)x / chunk_size),
+        Mathf.FloorToInt((float)y / chunk_size),
+        Mathf.FloorToInt((float)z / chunk_size)
+    );
+		if (chunks.ContainsKey(chunkPos)){
+			VoxelChunk voxelChunk = chunks[chunkPos];
 			return voxelChunk;
 		}
 
@@ -121,6 +124,7 @@ public partial class VoxelWorld : Node
 			int localX = ((x % chunk_size) + chunk_size) % chunk_size;
 			int localY = ((y % chunk_size) + chunk_size) % chunk_size;
 			int localZ = ((z % chunk_size) + chunk_size) % chunk_size;
+
 
 			VoxelBlock voxelBlock = chunk.getBlockAt(localX, localY, localZ);
 			return voxelBlock;	
@@ -318,7 +322,7 @@ public partial class VoxelWorld : Node
 		}
     }
 
-	private void regenChunk(VoxelChunk chunk){
+	public void regenChunk(VoxelChunk chunk){
 		RemoveChild(chunk.instance);
 		MeshInstance3D instance = chunk.buildMesh();
 

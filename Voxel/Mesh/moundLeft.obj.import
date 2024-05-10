@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://67w7kfsn81ia"
+path="res://.godot/imported/moundLeft.obj-ac74f76a952d63587228dbc738c3dfde.mesh"
+
+[deps]
+
+files=["res://.godot/imported/moundLeft.obj-ac74f76a952d63587228dbc738c3dfde.mesh"]
+
+source_file="res://Voxel/Mesh/moundLeft.obj"
+dest_files=["res://.godot/imported/moundLeft.obj-ac74f76a952d63587228dbc738c3dfde.mesh", "res://.godot/imported/moundLeft.obj-ac74f76a952d63587228dbc738c3dfde.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

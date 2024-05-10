@@ -1,0 +1,22 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://bt8he5csofpwn"
+path="res://.godot/imported/moundBottom.obj-949a89fd17c9ca48f976489cb28f2115.mesh"
+
+[deps]
+
+files=["res://.godot/imported/moundBottom.obj-949a89fd17c9ca48f976489cb28f2115.mesh"]
+
+source_file="res://Voxel/Mesh/moundBottom.obj"
+dest_files=["res://.godot/imported/moundBottom.obj-949a89fd17c9ca48f976489cb28f2115.mesh", "res://.godot/imported/moundBottom.obj-949a89fd17c9ca48f976489cb28f2115.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true
+force_disable_mesh_compression=false

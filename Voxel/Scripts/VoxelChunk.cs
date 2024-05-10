@@ -24,11 +24,42 @@ public partial class VoxelChunk
         // drawTerrain();
         blockList = voxelGenerator.build(voxelWorld, chunk_position);
 
+        // for (int x = 0; x < blockList.GetLength(0); x++)
+        // {
+        //     for (int y = 0; y < blockList.GetLength(1); y++)
+        //     {
+        //         for (int z = 0; z < blockList.GetLength(2); z++)
+        //         {
+        //             VoxelBlock voxelBlock = blockList[x, y, z];
+        //             if (voxelBlock != null){
+        //                 voxelBlock.parentChunk = this;
+        //                 // voxelBlock.localPosition = new Vector3I(x, y, z);
+        //                 voxelBlock.localPosition = new Vector3I(x, y, z);
+        //                 // voxelBlock.globalPosition = new Vector3I(chunk_position.X * voxelWorld.chunk_size, chunk_position.Y * voxelWorld.chunk_size, chunk_position.Z * voxelWorld.chunk_size) + voxelBlock.localPosition;
+        //             }
+        //         }
+        //     }
+        // }
+
         // build_mesh();
     }
 
     public MeshInstance3D buildMesh(){
         instance = builder.build(this);
+
+        for(int x = 0; x < blockList.GetLength(0); x++){
+            for(int y = 0; y < blockList.GetLength(1); y++){
+                for(int z = 0; z < blockList.GetLength(2); z++){
+                    VoxelBlock block = blockList[x, y, z];
+
+                    if(block != null){
+                        block.parentChunk = this;
+                        block.localPosition = new Vector3I(x, y, z);
+                    } 
+                }
+            }
+        }
+
         if (instance != null){
             instance.Position = new Vector3(chunk_position.X, chunk_position.Y, chunk_position.Z) * voxelWorld.chunk_size;
             // instance.Scale = new Vector3(0.8f, 0.8f, 0.8f);
@@ -38,6 +69,24 @@ public partial class VoxelChunk
 
         return instance;
     }
+
+    private void updateEdgeBlock(VoxelChunk chunk){
+        //if any blocks god updated we need to regen the mesh
+        bool hasChanged = false;
+        if(chunk.chunk_position.X < chunk_position.X){
+        // //left neighbor
+            for (int y = 0; y < voxelWorld.chunk_size; y++){
+                for(int z = 0; z < voxelWorld.chunk_size; z++){
+                    
+                }
+            }
+        }
+    }
+
+    
+    // public void updateNeighbor(VoxelChunk chunk){
+    //     bool hasChanged = false;
+    // }
 
     public bool removeBlockAt(int x, int y, int z){
         if (blockList[x, y, z] != null){

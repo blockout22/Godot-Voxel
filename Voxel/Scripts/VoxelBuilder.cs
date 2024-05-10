@@ -66,9 +66,10 @@ public partial class VoxelBuilder
                         };
 
                         int mask = getNeighborsMask(neighbors);
-
-                        // object[] testMask = new object[6]{false, 1, false, false, false, false};
+                        // //left = 1, bottom = 2, back = 4, front = 8, top = 16, right = 32
+                        // object[] testMask = new object[6]{false, false, false, false, false, false};
                         // int test = getNeighborsMask(testMask);
+                        // GD.Print(test);
                         // string toPint = "";
                         // for (int i = 0; i < neighbors.GetLength(0); i++){
                             // toPint += (neighbors[i] is bool ? "false" : "true") + " ";
