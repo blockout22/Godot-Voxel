@@ -3,9 +3,9 @@
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelWorld.cs" id="1_sbti3"]
 [ext_resource type="Script" path="res://free_cam.gd" id="2_4ougg"]
 [ext_resource type="Texture2D" uid="uid://cluaex1aecaku" path="res://Voxel/grass_16.png" id="2_ilbls"]
+[ext_resource type="Script" path="res://Voxel/Scripts/HillsTerrainGenerator.cs" id="2_ujhy7"]
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelBlock.cs" id="2_wv2qy"]
 [ext_resource type="Texture2D" uid="uid://cp4khwj8rwn14" path="res://Voxel/sand.png" id="3_5i27v"]
-[ext_resource type="Script" path="res://Voxel/Scripts/FlatTerrainGenerator.cs" id="6_fxw17"]
 [ext_resource type="ArrayMesh" uid="uid://67w7kfsn81ia" path="res://Voxel/Mesh/moundLeft.obj" id="6_n7hh4"]
 [ext_resource type="ArrayMesh" uid="uid://bt8he5csofpwn" path="res://Voxel/Mesh/moundBottom.obj" id="7_57dvn"]
 [ext_resource type="ArrayMesh" uid="uid://624fpdbdwf31" path="res://Voxel/Mesh/moundBack.obj" id="8_5a1rm"]
@@ -39,9 +39,8 @@ name = "grass"
 description = ""
 texture = ExtResource("3_5i27v")
 
-[sub_resource type="Resource" id="Resource_u3d3j"]
-script = ExtResource("6_fxw17")
-MaxTerrainHeight = 5
+[sub_resource type="Resource" id="Resource_2bhx7"]
+script = ExtResource("2_ujhy7")
 
 [node name="Node3D" type="Node3D"]
 
@@ -58,11 +57,11 @@ shadow_enabled = true
 [node name="VoxelTerrain" type="Node3D" parent="."]
 script = ExtResource("1_sbti3")
 registeredBlocks = Array[Object]([SubResource("Resource_vipnt"), SubResource("Resource_fn3vy")])
-voxelGenerator = SubResource("Resource_u3d3j")
+voxelGenerator = SubResource("Resource_2bhx7")
 MASK = [null, ExtResource("6_n7hh4"), ExtResource("7_57dvn"), null, ExtResource("8_5a1rm"), null, null, null, ExtResource("9_fgbi8"), null, null, null, null, null, null, null, ExtResource("10_ihjta"), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, ExtResource("11_mnb6x"), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null]
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.57372, 5)
 script = ExtResource("2_4ougg")
 
 [node name="Node3D" type="Node3D" parent="Camera3D" node_paths=PackedStringArray("voxelWorld")]

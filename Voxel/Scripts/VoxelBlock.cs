@@ -15,4 +15,13 @@ public partial class VoxelBlock : Resource
     public VoxelChunk parentChunk;
     public Vector3I localPosition;
     public Vector3I globalPosition;
+
+    public VoxelBlock Clone(){
+        VoxelBlock voxelBlock = new VoxelBlock();
+        voxelBlock.name = name;
+        voxelBlock.description = description;
+        voxelBlock.texture = texture;
+        voxelBlock.uvCoodds = uvCoodds;
+        return voxelBlock;
+    }
 }
