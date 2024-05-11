@@ -1,0 +1,54 @@
+[gd_scene load_steps=12 format=3 uid="uid://bkd0u658h5fnk"]
+
+[ext_resource type="Script" path="res://Voxel/Scripts/VoxelWorld.cs" id="1_uqmnb"]
+[ext_resource type="Script" path="res://Voxel/Scripts/VoxelBlock.cs" id="2_nmgy8"]
+[ext_resource type="Texture2D" uid="uid://cluaex1aecaku" path="res://Voxel/grass_16.png" id="3_2sps4"]
+[ext_resource type="Script" path="res://Voxel/examples/FiniteTerrain/IslandTerrainGenerator.cs" id="4_plw1b"]
+[ext_resource type="Script" path="res://Voxel/examples/utils/free_cam.gd" id="5_4wapq"]
+
+[sub_resource type="Resource" id="Resource_7rynj"]
+script = ExtResource("2_nmgy8")
+name = "grass"
+description = ""
+texture = ExtResource("3_2sps4")
+
+[sub_resource type="Resource" id="Resource_0lkx7"]
+script = ExtResource("2_nmgy8")
+name = "grass"
+description = ""
+texture = ExtResource("3_2sps4")
+
+[sub_resource type="Resource" id="Resource_28v1a"]
+script = ExtResource("4_plw1b")
+blockName = "grass"
+radius = 10.0
+height = 20.0
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_715qm"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_5tc6g"]
+sky_material = SubResource("ProceduralSkyMaterial_715qm")
+
+[sub_resource type="Environment" id="Environment_0kkw0"]
+background_mode = 2
+sky = SubResource("Sky_5tc6g")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="Scene" type="Node3D"]
+script = ExtResource("1_uqmnb")
+registeredBlocks = Array[Object]([SubResource("Resource_7rynj"), SubResource("Resource_0lkx7")])
+voxelGenerator = SubResource("Resource_28v1a")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0kkw0")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.0117186, -0.612966, 0.790022, 0.554745, 0.661325, 0.504883, -0.831938, 0.432344, 0.347789, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.999997, -0.00174011, 0.00190581, 0, 0.73848, 0.674276, -0.00258072, -0.674273, 0.738477, -0.0337699, 29.4726, 17.7958)
+script = ExtResource("5_4wapq")
