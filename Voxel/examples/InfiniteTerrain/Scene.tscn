@@ -1,0 +1,56 @@
+[gd_scene load_steps=13 format=3 uid="uid://duqje2cjwkemj"]
+
+[ext_resource type="Script" path="res://Voxel/Scripts/VoxelWorld.cs" id="1_nf1ha"]
+[ext_resource type="Script" path="res://Voxel/Scripts/VoxelBlock.cs" id="2_wsttu"]
+[ext_resource type="Texture2D" uid="uid://cp4khwj8rwn14" path="res://Voxel/sand.png" id="3_htdah"]
+[ext_resource type="Texture2D" uid="uid://cluaex1aecaku" path="res://Voxel/grass_16.png" id="4_1qcst"]
+[ext_resource type="Script" path="res://Voxel/Scripts/HillsTerrainGenerator.cs" id="5_aaxcr"]
+[ext_resource type="Script" path="res://Voxel/examples/utils/free_cam.gd" id="6_wjntt"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_miou8"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_nvru6"]
+sky_material = SubResource("ProceduralSkyMaterial_miou8")
+
+[sub_resource type="Environment" id="Environment_frjeq"]
+background_mode = 2
+sky = SubResource("Sky_nvru6")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="Resource" id="Resource_qlar6"]
+script = ExtResource("2_wsttu")
+name = "sand"
+description = ""
+texture = ExtResource("3_htdah")
+
+[sub_resource type="Resource" id="Resource_boko1"]
+script = ExtResource("2_wsttu")
+name = "grass"
+description = ""
+texture = ExtResource("4_1qcst")
+
+[sub_resource type="Resource" id="Resource_hism1"]
+script = ExtResource("5_aaxcr")
+blockName1 = "sand"
+blockName2 = "grass"
+
+[node name="Scene" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_frjeq")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.67555, -0.0249268, 0.736893, 0.706859, -0.306174, 0.637659, 0.209723, 0.951649, 0.224455, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Node3D" type="Node3D" parent="."]
+script = ExtResource("1_nf1ha")
+registeredBlocks = Array[Object]([SubResource("Resource_qlar6"), SubResource("Resource_boko1")])
+voxelGenerator = SubResource("Resource_hism1")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.59633, 0)
+script = ExtResource("6_wjntt")

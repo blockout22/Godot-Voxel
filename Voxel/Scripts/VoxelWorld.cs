@@ -20,7 +20,7 @@ public partial class VoxelWorld : Node
 	public List<Rect2> textureCoordinates = new List<Rect2>();
 
 	//Temp code
-	Vector3 lastGridPos = new Vector3(0, 0, 0);
+	Vector3 lastGridPos = new Vector3(-float.MaxValue, float.MaxValue, float.MaxValue);
 
 	[Export]
 	public VoxelBlock[] registeredBlocks;

@@ -4,6 +4,13 @@ using System;
 [GlobalClass]
 public partial class HillsTerrainGenerator : VoxelGenerator
 {
+
+    [Export]
+    public string blockName1 = "sand";
+
+    [Export]
+    public string blockName2 = "grass";
+
     public override VoxelBlock[,,] build(VoxelWorld voxelWorld, Vector3I chunkPosition)
     {
         int size = voxelWorld.chunk_size;
@@ -20,9 +27,9 @@ public partial class HillsTerrainGenerator : VoxelGenerator
 
                     float rand = GD.Randf();
                     if (rand < 0.1f){
-                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName("sand").Clone();
+                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName(blockName1).Clone();
                     }else if(rand < 0.9){
-                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName("grass").Clone();
+                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName(blockName2).Clone();
                     }
                     // else if(rand < 0.8){
                     //     // voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName("water");
