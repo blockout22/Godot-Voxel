@@ -53,6 +53,8 @@ public partial class VoxelBuilder
                 for (int z = 0; z < blockList.GetLength(2); z++){
                     VoxelBlock block = blockList[x, y, z];
                     if (block != null){
+                        block.parentChunk = chunk;
+                        block.localPosition = new Vector3I(x, y, z);
                         int neighbors = getNeighbors(chunk, x, y, z);
                         Rect2 uvRect = block.uvCoodds;
                         float uv_offset_x = uvRect.Position.X;

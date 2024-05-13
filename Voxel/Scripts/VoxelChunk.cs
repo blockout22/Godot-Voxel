@@ -47,18 +47,18 @@ public partial class VoxelChunk
     public MeshInstance3D buildMesh(){
         instance = builder.build(this);
 
-        for(int x = 0; x < blockList.GetLength(0); x++){
-            for(int y = 0; y < blockList.GetLength(1); y++){
-                for(int z = 0; z < blockList.GetLength(2); z++){
-                    VoxelBlock block = blockList[x, y, z];
+        // for(int x = 0; x < blockList.GetLength(0); x++){
+        //     for(int y = 0; y < blockList.GetLength(1); y++){
+        //         for(int z = 0; z < blockList.GetLength(2); z++){
+        //             VoxelBlock block = blockList[x, y, z];
 
-                    if(block != null){
-                        block.parentChunk = this;
-                        block.localPosition = new Vector3I(x, y, z);
-                    } 
-                }
-            }
-        }
+        //             if(block != null){
+        //                 block.parentChunk = this;
+        //                 block.localPosition = new Vector3I(x, y, z);
+        //             } 
+        //         }
+        //     }
+        // }
 
         if (instance != null){
             instance.Position = new Vector3(chunk_position.X, chunk_position.Y, chunk_position.Z) * voxelWorld.chunk_size;
