@@ -11,10 +11,10 @@ public partial class VoxelBuilder
     private static readonly Dictionary<string, Vector3[]> FACES = new Dictionary<string, Vector3[]>
     {
         { "left", new Vector3[] { new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(-0.5f, -0.5f, -0.5f) } },
-        { "front", new Vector3[] { new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.5f, -0.5f, 0.5f), new Vector3(-0.5f, -0.5f, 0.5f) } },
-        { "back", new Vector3[] { new Vector3(0.5f, 0.5f, -0.5f), new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f) } },
-        { "right", new Vector3[] { new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, 0.5f) } },
         { "bottom", new Vector3[] { new Vector3(-0.5f, -0.5f, 0.5f), new Vector3(0.5f, -0.5f, 0.5f), new Vector3(0.5f, -0.5f, -0.5f), new Vector3(-0.5f, -0.5f, -0.5f) } },
+        { "back", new Vector3[] { new Vector3(0.5f, 0.5f, -0.5f), new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(-0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f) } },
+        { "front", new Vector3[] { new Vector3(-0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.5f, -0.5f, 0.5f), new Vector3(-0.5f, -0.5f, 0.5f) } },
+        { "right", new Vector3[] { new Vector3(0.5f, 0.5f, 0.5f), new Vector3(0.5f, 0.5f, -0.5f), new Vector3(0.5f, -0.5f, -0.5f), new Vector3(0.5f, -0.5f, 0.5f) } },
         { "top", new Vector3[] { new Vector3(-0.5f, 0.5f, -0.5f), new Vector3(0.5f, 0.5f, -0.5f), new Vector3(0.5f, 0.5f, 0.5f), new Vector3(-0.5f, 0.5f, 0.5f) } }
     };
 
@@ -38,6 +38,8 @@ public partial class VoxelBuilder
 
     public VoxelBuilder(VoxelWorld _voxelWorld){
         voxelWorld = _voxelWorld;
+        Vector3 direction = CalculateDirection(1);
+        GD.Print(direction);
     }
 
     public MeshInstance3D build(VoxelChunk chunk){
@@ -51,7 +53,7 @@ public partial class VoxelBuilder
                 for (int z = 0; z < blockList.GetLength(2); z++){
                     VoxelBlock block = blockList[x, y, z];
                     if (block != null){
-                        object[] neighbors = getNeighbors(chunk, x, y, z);
+                        int neighbors = getNeighbors(chunk, x, y, z);
                         Rect2 uvRect = block.uvCoodds;
                         float uv_offset_x = uvRect.Position.X;
                         float uv_offset_y = uvRect.Position.Y;
@@ -65,7 +67,8 @@ public partial class VoxelBuilder
                             new Vector2(uv_offset_x, uv_offset_y + (1.0f * uv_grid_size_y))
                         };
 
-                        int mask = getNeighborsMask(neighbors);
+                        // int mask = getNeighborsMask(neighbors);
+
                         // //left = 1, bottom = 2, back = 4, front = 8, top = 16, right = 32
                         // object[] testMask = new object[6]{false, false, false, false, false, false};
                         // int test = getNeighborsMask(testMask);
@@ -76,7 +79,7 @@ public partial class VoxelBuilder
                         // }
                         // GD.Print(mask + " : " +  getNeighborsMask(testMask));
 
-                        drawFromMask(mask, x, y, z, faceUVs);
+                        drawFromMask(neighbors, x, y, z, faceUVs, chunk);
                     }
                 }
             }
@@ -87,14 +90,15 @@ public partial class VoxelBuilder
         }
 
         MeshInstance3D instance = new MeshInstance3D();
-        // surfaceTool.GenerateNormals();
+        surfaceTool.GenerateNormals();
         instance.Mesh = surfaceTool.Commit();
         return instance;
     }
 
-    private object[] getNeighbors(VoxelChunk chunk, int x, int y, int z){
+    private int getNeighbors(VoxelChunk chunk, int x, int y, int z){
         VoxelBlock[,,] blockList = chunk.blockList;
-        object[] neighbors = new object[6]{false, false, false, false, false, false};
+        // object[] neighbors = new object[6]{false, false, false, false, false, false};
+        int bitmask = 0;
         for (int i = 0; i < NEIGHBOR_OFFSETS.GetLength(0); i++){
             Vector3I offset = NEIGHBOR_OFFSETS[i];
             Vector3I neighbor_pos = new Vector3I(x, y, z) + offset;
@@ -107,7 +111,8 @@ public partial class VoxelBuilder
                     VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
 
                     if (block != null){
-                        neighbors[i] = neighorBlockPos;
+                        // neighbors[i] = neighorBlockPos;
+                        bitmask |= (1 << i);
                     }
                 }
                 continue;
@@ -121,7 +126,8 @@ public partial class VoxelBuilder
                     VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
 
                     if (block != null){
-                        neighbors[i] = neighorBlockPos;
+                        bitmask |= (1 << i);
+                        // neighbors[i] = neighorBlockPos;
                     }
                 }
                 continue;
@@ -135,7 +141,8 @@ public partial class VoxelBuilder
                     VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
 
                     if (block != null){
-                        neighbors[i] = neighorBlockPos;
+                        bitmask |= (1 << i);
+                        // neighbors[i] = neighorBlockPos;
                     }
                 }
                 continue;
@@ -148,7 +155,8 @@ public partial class VoxelBuilder
                     VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
 
                     if (block != null){
-                        neighbors[i] = neighorBlockPos;
+                        bitmask |= (1 << i);
+                        // neighbors[i] = neighorBlockPos;
                     }
                 }
                 continue;
@@ -161,7 +169,8 @@ public partial class VoxelBuilder
                     VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
 
                     if (block != null){
-                        neighbors[i] = neighorBlockPos;
+                        bitmask |= (1 << i);
+                        // neighbors[i] = neighorBlockPos;
                     }
                 }
                 continue;
@@ -174,7 +183,8 @@ public partial class VoxelBuilder
                     VoxelBlock block = neighborChunk.blockList[neighorBlockPos.X, neighorBlockPos.Y, neighorBlockPos.Z];
 
                     if (block != null){
-                        neighbors[i] = neighorBlockPos;
+                        bitmask |= (1 << i);
+                        // neighbors[i] = neighorBlockPos;
                     }
                 }
                 continue;
@@ -183,10 +193,11 @@ public partial class VoxelBuilder
             if (blockList[neighbor_pos.X, neighbor_pos.Y, neighbor_pos.Z] != null){
                 // GD.Print("Neightpos: " + NEIGHBOR_OFFSETS[i].Y );
                 //maybe change neighbor_pos to be the blocks global pos and not the chunks block local position
-                neighbors[i] = neighbor_pos;
+                bitmask |= (1 << i);
+                // neighbors[i] = neighbor_pos;
             }
         }
-        return neighbors;
+        return bitmask;
     }
 
     private int getNeighborsMask(object[] neighbors){
@@ -218,43 +229,317 @@ public partial class VoxelBuilder
         return adjustedUVs;
     }
 
-    private void drawFromMask(int mask, int x, int y, int z, Vector2[] uvs){
-            Mesh mesh = voxelWorld.MASK[mask];
-            if(mesh != null){
-                Dictionary<string, object> data = voxelWorld.extractMeshData(mesh);
-                 Vector2[] adjustedUVs = applyUVAdjustment((Vector2[])data["uvs"], uvs);
-                draw((Vector3[])data["vertices"], (int[])data["indices"], new Vector3(x, y, z), adjustedUVs);
-                return;
+    private static Dictionary<string, Vector3[]> CopyFaces(Dictionary<string, Vector3[]> original)
+    {
+        var copy = new Dictionary<string, Vector3[]>();
+
+        foreach (var item in original)
+        {
+            Vector3[] vectorsCopy = new Vector3[item.Value.Length];
+            item.Value.CopyTo(vectorsCopy, 0);
+            copy.Add(item.Key, vectorsCopy);
+        }
+
+        return copy;
+    }
+
+    private Vector3[] changeVectorVertexFromArray(Vector3[] array, float fromX, float fromY, float fromZ, float toX, float toY, float toZ){
+        for (int i = 0; i < array.Length; i++){
+            Vector3 old = new Vector3(array[i].X, array[i].Y, array[i].Z);
+            if(array[i].X == fromX && array[i].Y == fromY && array[i].Z == fromZ){
+                array[i].X = toX;
+                array[i].Y = toY;
+                array[i].Z = toZ;
             }
+        }
+
+        return array;
+    }
+
+    private static Vector3[] DeepCopyVectorArray(Vector3[] original)
+    {
+        Vector3[] copy = new Vector3[original.Length];
+        for (int i = 0; i < original.Length; i++)
+        {
+            copy[i] = new Vector3(original[i].X, original[i].Y, original[i].Z);
+        }
+        return copy;
+    }
+
+    private int drawSmooth(int _mask, Vector3 offset, Vector2[] uvs){
+        int mask = _mask;
+        if (mask == 0){
+            return _mask;
+        }
+
+        int neighborCount = 0;
+        while(mask != 0){
+            mask &= mask - 1;
+            neighborCount++;
+        }
+
+        int processedMask = 0;
+
+        if(neighborCount > 1){
+            Vector3[] left = DeepCopyVectorArray(FACES["left"]);
+            Vector3[] bottom = DeepCopyVectorArray(FACES["bottom"]);
+            Vector3[] back = DeepCopyVectorArray(FACES["back"]);
+            Vector3[] front = DeepCopyVectorArray(FACES["front"]);
+            Vector3[] top = DeepCopyVectorArray(FACES["top"]);
+            Vector3[] right = DeepCopyVectorArray(FACES["right"]);
+
+            foreach(Vector3 vertex in left){
+                float totalX = vertex.X;
+                float totalY = vertex.Y;
+                float totalZ = vertex.Z;
+                int count = 1;
+
+                for(int x = -1; x <= 1; x++){
+                    for(int y = -1; x <= 1; y++){
+                        for(int z = -1; z <= 1; z++){
+                            int _x = (int)(offset.X + x);
+                            int _y = (int)(offset.Y + y);
+                            int _z = (int)(offset.Z + z);
+
+                            if(_x > 0 && _y > 0 && _z > 0 && _x < voxelWorld.chunk_size - 1 && _y < voxelWorld.chunk_size - 1 && _z < voxelWorld.chunk_size - 1){
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            bool drawLeft = true;
+            bool drawBottom = true;
+            bool drawBack = true;
+            bool drawFront = true;
+            bool drawTop = true;
+            bool drawRight = true;
+
+
+            // //1001100 left-front-top
+            if(((_mask & 1 << 0) == 0) && ((_mask & 1 << 3) == 0) && ((_mask & 1 << 4) == 0)){
+                left = changeVectorVertexFromArray(left, -0.5f, 0.5f, 0.5f, 0, 0, 0);
+                front = changeVectorVertexFromArray(front, -0.5f, 0.5f, 0.5f, 0, 0, 0);
+                top = changeVectorVertexFromArray(top, -0.5f, 0.5f, 0.5f, 0, 0, 0);
+
+                drawLeft = true;
+                drawFront = true;
+                drawTop = true;
+                // processedMask |= (1 << 0) | (1 << 3) | (1 << 4);
+
+                if((processedMask & (1 << 0)) == 0){
+                    processedMask |= 1 << 0;
+                }
+
+                if((processedMask & (1 << 3)) == 0){
+                    processedMask |= 1 << 3;
+                }
+
+                if((processedMask & (1 << 4)) == 0){
+                    processedMask |= 1 << 4;
+                }
+            }
+
+            //1001100 front-top-right
+            if(((_mask & 1 << 3) == 0) && ((_mask & 1 << 4) == 0) && ((_mask & 1 << 5) == 0)){
+                front = changeVectorVertexFromArray(front, 0.5f, 0.5f, 0.5f, 0, 0, 0);
+                top = changeVectorVertexFromArray(top, 0.5f, 0.5f, 0.5f, 0, 0, 0);
+                right = changeVectorVertexFromArray(right, 0.5f, 0.5f, 0.5f, 0, 0, 0);
+
+                drawFront = true;
+                drawTop = true;
+                drawRight = true;
+
+                if((processedMask & (1 << 3)) == 0){
+                    processedMask |= 1 << 3;
+                }
+
+                if((processedMask & (1 << 4)) == 0){
+                    processedMask |= 1 << 4;
+                }
+
+                if((processedMask & (1 << 5)) == 0){
+                    processedMask |= 1 << 5;
+                }
+            }
+
+            //0101001 bottom-front-right
+            if(((_mask & 1 << 1) == 0) && ((_mask & 1 << 3) == 0) && ((_mask & 1 << 5) == 0)){
+                bottom = changeVectorVertexFromArray(bottom, 0.5f, -0.5f, 0.5f, 0, 0, 0);
+                front = changeVectorVertexFromArray(front, 0.5f, -0.5f, 0.5f, 0, 0, 0);
+                right = changeVectorVertexFromArray(right, 0.5f, -0.5f, 0.5f, 0, 0, 0);
+
+                drawBottom = true;
+                drawFront = true;
+                drawRight = true;
+
+                if((processedMask & (1 << 1)) == 0){
+                    processedMask |= 1 << 1;
+                }
+
+                if((processedMask & (1 << 3)) == 0){
+                    processedMask |= 1 << 3;
+                }
+
+                if((processedMask & (1 << 5)) == 0){
+                    processedMask |= 1 << 5;
+                }
+            }
+
+            //110100 left-bottom-front
+            if(((_mask & 1 << 0) == 0) && ((_mask & 1 << 1) == 0) && ((_mask & 1 << 3) == 0)){
+                left = changeVectorVertexFromArray(left, -0.5f, -0.5f, 0.5f, 0, 0, 0);
+                bottom = changeVectorVertexFromArray(bottom, -0.5f, -0.5f, 0.5f, 0, 0, 0);
+                front = changeVectorVertexFromArray(front, -0.5f, -0.5f, 0.5f, 0, 0, 0);
+
+                drawLeft = true;
+                drawBottom = true;
+                drawFront = true;
+
+                if((processedMask & (1 << 0)) == 0){
+                    processedMask |= 1 << 0;
+                }
+
+                if((processedMask & (1 << 1)) == 0){
+                    processedMask |= 1 << 1;
+                }
+
+                if((processedMask & (1 << 3)) == 0){
+                    processedMask |= 1 << 3;
+                }
+            }
+            
+            if(drawLeft){
+                draw(left, CUBE_INDICES, offset, uvs);
+            }
+
+            if(drawBottom){
+                draw(bottom, CUBE_INDICES, offset, uvs);
+            }
+
+            if(drawBack){
+                draw(back, CUBE_INDICES, offset, uvs);
+            }
+
+            if(drawFront){
+                draw(front, CUBE_INDICES, offset, uvs);
+            }
+
+            if(drawTop){
+                draw(top, CUBE_INDICES, offset, uvs);
+            }
+
+            if(drawRight){
+                draw(right, CUBE_INDICES, offset, uvs);
+            }
+        }
+
+
+        return _mask ^ processedMask;
+    }
+
+    public Vector3 CalculateDirection(int bitmask)
+    {
+        Vector3 result = Vector3.Zero;
+
+        for (int i = 0; i < NEIGHBOR_OFFSETS.Length; i++)
+        {
+            if ((bitmask & (1 << i)) != 0) // Check if the ith bit is set
+            {
+                result += NEIGHBOR_OFFSETS[i]; // Add the corresponding direction to the result
+            }
+        }
+
+        return result.Normalized(); // Normalize the result to return a unit vector
+    }
+
+    public void moveVerticesDirection(Vector3[] vertices, Vector3 direction, float strength){
+        int zeros = 0;
+
+        if (direction.X == 0){
+            zeros++;
+        }
+
+        if (direction.Y == 0){
+            zeros++;
+        }
+
+        if (direction.Z == 0){
+            zeros++;
+        }
+
+        if(zeros >= 2){
+            return;
+        }
+
+        for (int i = 0; i < vertices.Length; i++){
+            // Vector3 moved = (vertices[i] + direction) * strength;
+            Vector3 moved = vertices[i];
+            moved += direction * strength;
+
+            moved.X = Mathf.Clamp(moved.X, -0.5f, 0.5f);
+            moved.Y = Mathf.Clamp(moved.Y, -0.5f, 0.5f);
+            moved.Z = Mathf.Clamp(moved.Z, -0.5f, 0.5f);
+            vertices[i] = moved;
+        }
+    }
+
+    private void drawFromMask(int mask, int x, int y, int z, Vector2[] uvs, VoxelChunk chunk){
+        Vector3 offset = new Vector3(x, y, z);
+        // Mesh mesh = voxelWorld.MASK[mask];
+        // if(mesh != null){
+        //     Dictionary<string, object> data = voxelWorld.extractMeshData(mesh);
+        //         Vector2[] adjustedUVs = applyUVAdjustment((Vector2[])data["uvs"], uvs);
+        //     draw((Vector3[])data["vertices"], (int[])data["indices"], offset, adjustedUVs);
+        //     return;
+        // }
+
+        // int mask = drawSmooth(_mask, offset, uvs);
+
+        Vector3 direction = CalculateDirection(mask);
+        float strength = 0.5f;
 
         if ((mask & 1 << 0) == 0){
             FACES.TryGetValue("left", out Vector3[] verts);
-            draw(verts, CUBE_INDICES, new Vector3(x, y, z), uvs);
+            // Vector3[] copy = DeepCopyVectorArray(verts);
+            // moveVerticesDirection(copy, direction, strength);
+            draw(verts, CUBE_INDICES, offset, uvs);
         }
 
         if ((mask & 1 << 1) == 0){
             FACES.TryGetValue("bottom", out Vector3[] verts);
-            draw(verts, CUBE_INDICES, new Vector3(x, y, z), uvs);
+            // Vector3[] copy = DeepCopyVectorArray(verts);
+            // moveVerticesDirection(copy, direction, strength);
+            draw(verts, CUBE_INDICES, offset, uvs);
         }
 
         if ((mask & 1 << 2) == 0){
             FACES.TryGetValue("back", out Vector3[] verts);
-            draw(verts, CUBE_INDICES, new Vector3(x, y, z), uvs);
+            // Vector3[] copy = DeepCopyVectorArray(verts);
+            // moveVerticesDirection(copy, direction, strength);
+            draw(verts, CUBE_INDICES, offset, uvs);
         }
 
         if ((mask & 1 << 3) == 0){
             FACES.TryGetValue("front", out Vector3[] verts);
-            draw(verts, CUBE_INDICES, new Vector3(x, y, z), uvs);
+            // Vector3[] copy = DeepCopyVectorArray(verts);
+            // moveVerticesDirection(copy, direction, strength);
+            draw(verts, CUBE_INDICES, offset, uvs);
         }
 
         if ((mask & 1 << 4) == 0){
             FACES.TryGetValue("top", out Vector3[] verts);
-            draw(verts, CUBE_INDICES, new Vector3(x, y, z), uvs);
+            // Vector3[] copy = DeepCopyVectorArray(verts);
+            // moveVerticesDirection(copy, direction, strength);
+            draw(verts, CUBE_INDICES, offset, uvs);
         }
 
         if ((mask & 1 << 5) == 0){
             FACES.TryGetValue("right", out Vector3[] verts);
-            draw(verts, CUBE_INDICES, new Vector3(x, y, z), uvs);
+            // Vector3[] copy = DeepCopyVectorArray(verts);
+            // moveVerticesDirection(copy, direction, strength);
+            draw(verts, CUBE_INDICES, offset, uvs);
         }
     }
 
