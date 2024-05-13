@@ -1,4 +1,5 @@
 using Godot;
+using Godot.Collections;
 using System;
 
 public partial class VoxelChunk
@@ -45,7 +46,27 @@ public partial class VoxelChunk
     }
 
     public MeshInstance3D buildMesh(){
-        instance = builder.build(this);
+        Mesh mesh = builder.build(this);
+        //remove old collision
+        if(mesh == null){
+            return null;
+        }
+
+        if(instance == null){
+            instance = new MeshInstance3D();
+        }else{
+            Array<Node> chilren = instance.GetChildren();
+
+            foreach(Node node in chilren){
+                if(node is StaticBody3D){
+                    GD.Print("Found static body");
+                    instance.RemoveChild(node);
+
+                    break;
+                }
+            }
+        }
+        instance.Mesh = mesh;
 
         // for(int x = 0; x < blockList.GetLength(0); x++){
         //     for(int y = 0; y < blockList.GetLength(1); y++){

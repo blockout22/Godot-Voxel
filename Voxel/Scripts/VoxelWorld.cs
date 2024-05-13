@@ -118,7 +118,8 @@ public partial class VoxelWorld : Node
 	}
 
 	public VoxelBlock getVoxelBlockAt(int x, int y, int z){
-		VoxelChunk chunk = getVoxelChunkAt(x, y, z);		
+		VoxelChunk chunk = getVoxelChunkAt(x, y, z);
+		GD.Print(chunk);	
 
 		if(chunk != null){
 			int localX = ((x % chunk_size) + chunk_size) % chunk_size;
@@ -323,10 +324,9 @@ public partial class VoxelWorld : Node
     }
 
 	public void regenChunk(VoxelChunk chunk){
-		RemoveChild(chunk.instance);
+		// RemoveChild(chunk.instance);
 		MeshInstance3D instance = chunk.buildMesh();
-
-		AddChild(instance);
+		// AddChild(instance);
 	}
 
 	private void addChunk(VoxelChunk _chunk){

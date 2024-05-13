@@ -42,7 +42,7 @@ public partial class VoxelBuilder
         GD.Print(direction);
     }
 
-    public MeshInstance3D build(VoxelChunk chunk){
+    public Mesh build(VoxelChunk chunk){
         VoxelBlock[,,] blockList = chunk.blockList;
         surfaceTool = new SurfaceTool();
         vertexCount = 0;
@@ -91,10 +91,10 @@ public partial class VoxelBuilder
             return null;
         }
 
-        MeshInstance3D instance = new MeshInstance3D();
+        // MeshInstance3D instance = new MeshInstance3D();
         surfaceTool.GenerateNormals();
-        instance.Mesh = surfaceTool.Commit();
-        return instance;
+        // instance.Mesh = surfaceTool.Commit();
+        return surfaceTool.Commit();
     }
 
     private int getNeighbors(VoxelChunk chunk, int x, int y, int z){
