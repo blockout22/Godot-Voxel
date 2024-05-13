@@ -38,8 +38,8 @@ public partial class VoxelBuilder
 
     public VoxelBuilder(VoxelWorld _voxelWorld){
         voxelWorld = _voxelWorld;
-        Vector3 direction = CalculateDirection(1);
-        GD.Print(direction);
+        // Vector3 direction = CalculateDirection(1);
+        // GD.Print(direction);
     }
 
     public Mesh build(VoxelChunk chunk){

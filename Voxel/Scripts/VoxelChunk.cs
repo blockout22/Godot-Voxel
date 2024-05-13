@@ -59,7 +59,6 @@ public partial class VoxelChunk
 
             foreach(Node node in chilren){
                 if(node is StaticBody3D){
-                    GD.Print("Found static body");
                     instance.RemoveChild(node);
 
                     break;
@@ -112,6 +111,49 @@ public partial class VoxelChunk
     public bool removeBlockAt(int x, int y, int z){
         if (blockList[x, y, z] != null){
             blockList[x, y, z] = null;
+
+            //update neighboring chunks
+            if(x == 0){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X - 1, chunk_position.Y, chunk_position.Z);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if(y == 0){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y - 1, chunk_position.Z);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if(z == 0){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y, chunk_position.Z - 1);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if (x == voxelWorld.chunk_size - 1){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X + 1, chunk_position.Y, chunk_position.Z);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if (y == voxelWorld.chunk_size - 1){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y + 1, chunk_position.Z);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if (z == voxelWorld.chunk_size - 1){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y, chunk_position.Z + 1);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
             return true;
         }
 

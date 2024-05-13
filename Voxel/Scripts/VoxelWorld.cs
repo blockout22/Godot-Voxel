@@ -119,7 +119,6 @@ public partial class VoxelWorld : Node
 
 	public VoxelBlock getVoxelBlockAt(int x, int y, int z){
 		VoxelChunk chunk = getVoxelChunkAt(x, y, z);
-		GD.Print(chunk);	
 
 		if(chunk != null){
 			int localX = ((x % chunk_size) + chunk_size) % chunk_size;
