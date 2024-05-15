@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 public partial class VoxelWorld : Node
 {
@@ -35,6 +36,8 @@ public partial class VoxelWorld : Node
 	public VoxelGenerator voxelGenerator;
 	[Export]
 	public Mesh[] MASK = new Mesh[64];
+
+	private List<VoxelChunk> loadingChunks = new List<VoxelChunk>();
 
     public override void _Ready()
     {
@@ -73,9 +76,9 @@ public partial class VoxelWorld : Node
 		// for(int x = -5; x < 5; x++){
 		// 	for(int y = -5; y < 5; y++){
 		// 		for(int z = -5; z < 5; z++){
+
 					VoxelChunk chunk = new VoxelChunk(this, new Vector3I(0, 0, 0));
 					chunk.generate(voxelGenerator);
-		// 			tempChunkStorage.Add(chunk);
 					addChunk(chunk);
 					buildAndRenderChunk(chunk);
 		// 		}
@@ -299,6 +302,11 @@ public partial class VoxelWorld : Node
     {
         base._Process(delta);
 
+		if(loadingChunks.Count > 0){
+			loadingChunks[0].buildMesh(VoxelBuilder.LOD.HIGH);
+			loadingChunks.RemoveAt(0);
+		}
+
 		Vector3 controllerPos = GetViewport().GetCamera3D().GlobalPosition;
 		Vector3I grid_position = new Vector3I((int)MathF.Floor(controllerPos.X / chunk_size), (int)MathF.Floor(controllerPos.Y / chunk_size), (int)MathF.Floor(controllerPos.Z / chunk_size));
 
@@ -324,7 +332,7 @@ public partial class VoxelWorld : Node
 
 	public void regenChunk(VoxelChunk chunk){
 		// RemoveChild(chunk.instance);
-		MeshInstance3D instance = chunk.buildMesh();
+		MeshInstance3D instance = chunk.buildMesh(VoxelBuilder.LOD.HIGH);
 		// AddChild(instance);
 	}
 
@@ -342,10 +350,18 @@ public partial class VoxelWorld : Node
 
 	private void buildAndRenderChunk(VoxelChunk _chunk){
 		//Create and add instance to world
-		MeshInstance3D instance = _chunk.buildMesh();
+		MeshInstance3D instance = _chunk.buildMesh(VoxelBuilder.LOD.LOW);
+		loadingChunks.Add(_chunk);
 		if (instance != null){
 			AddChild(instance);
 		}
+
+		// ThreadPool.QueueUserWorkItem(_ =>
+		// {
+		// 	_chunk.buildMesh(VoxelBuilder.LOD.HIGH);
+		// });
+
+		// await _chunk.buildMesh(VoxelBuilder.LOD.HIGH);
 		// GD.Print("Created chunk at: " + grid_position);
 	}
 }

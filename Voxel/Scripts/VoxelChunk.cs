@@ -1,6 +1,8 @@
 using Godot;
 using Godot.Collections;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 public partial class VoxelChunk
 {
@@ -45,8 +47,8 @@ public partial class VoxelChunk
         // build_mesh();
     }
 
-    public MeshInstance3D buildMesh(){
-        Mesh mesh = builder.build(this);
+    public MeshInstance3D buildMesh(VoxelBuilder.LOD lod){
+        Mesh mesh = builder.build(this, lod);
         //remove old collision
         if(mesh == null){
             return null;
@@ -88,6 +90,11 @@ public partial class VoxelChunk
         }
 
         return instance;
+    }
+
+    private void updateMesh(MeshInstance3D instance, Mesh mesh){
+        instance.Mesh = mesh;
+        GD.Print("Updated to newer mesh: " + instance + " : " + mesh);
     }
 
     private void updateEdgeBlock(VoxelChunk chunk){
