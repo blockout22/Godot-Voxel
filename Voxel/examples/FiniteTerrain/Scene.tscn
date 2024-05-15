@@ -1,8 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://bkd0u658h5fnk"]
+[gd_scene load_steps=13 format=3 uid="uid://bkd0u658h5fnk"]
 
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelWorld.cs" id="1_uqmnb"]
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelBlock.cs" id="2_nmgy8"]
 [ext_resource type="Texture2D" uid="uid://cluaex1aecaku" path="res://Voxel/grass_16.png" id="3_2sps4"]
+[ext_resource type="Texture2D" uid="uid://cp4khwj8rwn14" path="res://Voxel/sand.png" id="4_oeucx"]
 [ext_resource type="Script" path="res://Voxel/examples/FiniteTerrain/IslandTerrainGenerator.cs" id="4_plw1b"]
 [ext_resource type="Script" path="res://Voxel/examples/utils/free_cam.gd" id="5_4wapq"]
 
@@ -10,13 +11,13 @@
 script = ExtResource("2_nmgy8")
 name = "grass"
 description = ""
-texture = ExtResource("3_2sps4")
+topTexture = ExtResource("3_2sps4")
 
 [sub_resource type="Resource" id="Resource_0lkx7"]
 script = ExtResource("2_nmgy8")
-name = "grass"
+name = "sand"
 description = ""
-texture = ExtResource("3_2sps4")
+topTexture = ExtResource("4_oeucx")
 
 [sub_resource type="Resource" id="Resource_28v1a"]
 script = ExtResource("4_plw1b")

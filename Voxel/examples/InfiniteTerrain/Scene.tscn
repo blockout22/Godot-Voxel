@@ -24,13 +24,13 @@ glow_enabled = true
 script = ExtResource("2_wsttu")
 name = "sand"
 description = ""
-texture = ExtResource("3_htdah")
+topTexture = ExtResource("3_htdah")
 
 [sub_resource type="Resource" id="Resource_boko1"]
 script = ExtResource("2_wsttu")
 name = "grass"
 description = ""
-texture = ExtResource("4_1qcst")
+topTexture = ExtResource("4_1qcst")
 
 [sub_resource type="Resource" id="Resource_hism1"]
 script = ExtResource("5_aaxcr")

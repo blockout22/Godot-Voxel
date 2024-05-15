@@ -18,7 +18,7 @@ public partial class VoxelWorld : Node
 	private readonly Dictionary<Mesh, Dictionary<string, object>> meshCache = new Dictionary<Mesh, Dictionary<string, object>>();
 
 	private Texture2D textureAtlas;
-	public List<Rect2> textureCoordinates = new List<Rect2>();
+	// public List<Rect2> textureCoordinates = new List<Rect2>();
 
 	//Temp code
 	Vector3 lastGridPos = new Vector3(-float.MaxValue, float.MaxValue, float.MaxValue);
@@ -46,9 +46,9 @@ public partial class VoxelWorld : Node
 		createAtlas();
 
 		// assign uv coords to blocks
-		for (int i = 0; i < registeredBlocks.GetLength(0); i++){
-			((VoxelBlock)registeredBlocks[i]).uvCoodds = textureCoordinates[i];
-		}
+		// for (int i = 0; i < registeredBlocks.GetLength(0); i++){
+		// 	((VoxelBlock)registeredBlocks[i]).UVCoordsTop = textureCoordinates[i];
+		// }
 
 		//TODO Create texture atlas from all blocks
 		material = new OrmMaterial3D();
@@ -146,10 +146,36 @@ public partial class VoxelWorld : Node
 		int totalArea = 0;
 		for(int j = 0; j < registeredBlocks.GetLength(0); j++)
 		{
-			Texture2D texture = ((VoxelBlock)registeredBlocks[j]).texture;
-			if (texture == null) continue;
+			Texture2D topTexture = ((VoxelBlock)registeredBlocks[j]).topTexture;
+			Texture2D bottomTexture = ((VoxelBlock)registeredBlocks[j]).bottomTexture;
+			Texture2D frontTexture = ((VoxelBlock)registeredBlocks[j]).frontTexture;
+			Texture2D backTexture = ((VoxelBlock)registeredBlocks[j]).backTexture;
+			Texture2D leftTexture = ((VoxelBlock)registeredBlocks[j]).leftTexture;
+			Texture2D rightTexture = ((VoxelBlock)registeredBlocks[j]).rightTexture;
+			
+			if(topTexture != null){
+				totalArea += (topTexture.GetWidth()) * (topTexture.GetHeight());
+			}
 
-			totalArea += (texture.GetWidth()) * (texture.GetHeight());
+			if(bottomTexture != null){
+				totalArea += (bottomTexture.GetWidth()) * (bottomTexture.GetHeight());
+			}
+
+			if(frontTexture != null){
+				totalArea += (frontTexture.GetWidth()) * (frontTexture.GetHeight());
+			}
+
+			if (backTexture != null){
+				totalArea += (backTexture.GetWidth()) * (backTexture.GetHeight());
+			}
+
+			if(leftTexture != null){
+				totalArea += (leftTexture.GetWidth()) * (leftTexture.GetHeight());
+			}
+
+			if(rightTexture != null){
+				totalArea += (rightTexture.GetWidth()) * (rightTexture.GetHeight());
+			}
 		}
 
 		float size = Mathf.Pow(2, Mathf.Ceil(Mathf.Log(Mathf.Sqrt(totalArea)) / Mathf.Log(2)));
@@ -166,36 +192,64 @@ public partial class VoxelWorld : Node
 		int maxHeightInRow = 0;
 
 		for(int i = 0; i < registeredBlocks.GetLength(0); i++){
-			Texture2D texture2d = ((VoxelBlock)registeredBlocks[i]).texture; 
-			Image texture = texture2d.GetImage();
-
-			if (texture == null){
-				continue;
+			Texture2D topTexture = ((VoxelBlock)registeredBlocks[i]).topTexture;
+			Texture2D bottomTexture = ((VoxelBlock)registeredBlocks[i]).bottomTexture;
+			Texture2D frontTexture = ((VoxelBlock)registeredBlocks[i]).frontTexture;
+			Texture2D backTexture = ((VoxelBlock)registeredBlocks[i]).backTexture;
+			Texture2D leftTexture = ((VoxelBlock)registeredBlocks[i]).leftTexture;
+			Texture2D rightTexture = ((VoxelBlock)registeredBlocks[i]).rightTexture;
+			
+			if(topTexture != null){
+				((VoxelBlock)registeredBlocks[i]).UVCoordsTop = processTexture(image, topTexture, ref x, ref y, ref maxHeightInRow, size, padding);
 			}
 
-			int texWidth = texture.GetWidth();
-			int texHeight = texture.GetHeight();
-
-			if (x + texWidth + padding > size){
-				x = 0;
-				y += maxHeightInRow + padding;
-				maxHeightInRow = 0;
+			if(bottomTexture != null){
+				((VoxelBlock)registeredBlocks[i]).UVCoordsBottom = processTexture(image, bottomTexture, ref x, ref y, ref maxHeightInRow, size, padding);
 			}
 
-			if (y + texHeight + padding > size){
-				GD.Print("Texture atlas to small");
-				break;
-			}
-				image.BlitRect(texture, new Rect2I(Vector2I.Zero, new Vector2I(texWidth, texHeight)), new Vector2I(x, y));
-				Rect2 texCoords = new Rect2((float)x / size, (float)y / size, (float)texWidth / size, (float)texHeight / size);
-           		textureCoordinates.Add(texCoords);
-
-				x += texWidth + padding;
-				maxHeightInRow = Mathf.Max(maxHeightInRow, texHeight);
+			if(frontTexture != null){
+				((VoxelBlock)registeredBlocks[i]).UVCoordsFront = processTexture(image, frontTexture, ref x, ref y, ref maxHeightInRow, size, padding);
 			}
 
-			image.GenerateMipmaps();
-			textureAtlas = ImageTexture.CreateFromImage(image);
+			if (backTexture != null){
+				((VoxelBlock)registeredBlocks[i]).UVCoordsBack = processTexture(image, backTexture, ref x, ref y, ref maxHeightInRow, size, padding);
+			}
+
+			if(leftTexture != null){
+				((VoxelBlock)registeredBlocks[i]).UVCoordsLeft = processTexture(image, leftTexture, ref x, ref y, ref maxHeightInRow, size, padding);
+			}
+
+			if(rightTexture != null){
+				((VoxelBlock)registeredBlocks[i]).UVCoordsRight = processTexture(image, rightTexture, ref x, ref y, ref maxHeightInRow, size, padding);
+			}
+			
+		}
+
+		image.GenerateMipmaps();
+		textureAtlas = ImageTexture.CreateFromImage(image);
+	}
+
+	private Rect2 processTexture(Image image, Texture2D texture2d, ref int x, ref int y, ref int maxHeightInRow, float size, int padding){
+		Image texture = texture2d.GetImage();
+		int texWidth = texture.GetWidth();
+		int texHeight = texture.GetHeight();
+
+		if (x + texWidth + padding > size){
+			x = 0;
+			y += maxHeightInRow + padding;
+			maxHeightInRow = 0;
+		}
+
+		if (y + texHeight + padding > size){
+			GD.Print("Texture atlas to small");
+		}
+		image.BlitRect(texture, new Rect2I(Vector2I.Zero, new Vector2I(texWidth, texHeight)), new Vector2I(x, y));
+		Rect2 texCoords = new Rect2((float)x / size, (float)y / size, (float)texWidth / size, (float)texHeight / size);
+		// textureCoordinates.Add(texCoords);
+
+		x += texWidth + padding;
+		maxHeightInRow = Mathf.Max(maxHeightInRow, texHeight);
+		return texCoords;
 	}
 
 	public Dictionary<string, object> extractMeshData(Mesh mesh)
