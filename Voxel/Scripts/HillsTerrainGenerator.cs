@@ -27,9 +27,10 @@ public partial class HillsTerrainGenerator : VoxelGenerator
 
                     float rand = GD.Randf();
                     if (rand < 0.1f){
-                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName(blockName1).Clone();
+                        voxelBlock = (BlockSand)voxelWorld.findRegisteredBlockByName(blockName1).CloneAs<BlockSand>();
+                        ((BlockSand)voxelBlock).helloSand();
                     }else if(rand < 0.9){
-                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName(blockName2).Clone();
+                        voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName(blockName2).CloneAs<VoxelBlock>();
                     }
                     // else if(rand < 0.8){
                     //     // voxelBlock = (VoxelBlock)voxelWorld.findRegisteredBlockByName("water");

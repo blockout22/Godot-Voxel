@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Reflection;
 
 [GlobalClass]
 public partial class VoxelBlock : Resource
@@ -32,23 +33,47 @@ public partial class VoxelBlock : Resource
     public Vector3I localPosition;
     public Vector3I globalPosition;
 
-    public VoxelBlock Clone(){
-        VoxelBlock voxelBlock = new VoxelBlock();
-        voxelBlock.name = name;
-        voxelBlock.description = description;
-        voxelBlock.topTexture = topTexture;
-        voxelBlock.leftTexture = leftTexture;
-        voxelBlock.rightTexture = rightTexture;
-        voxelBlock.bottomTexture = bottomTexture;
-        voxelBlock.frontTexture = frontTexture;
-        voxelBlock.backTexture = backTexture;
+    public T CloneAs<T>() where T : VoxelBlock, new(){
+        // VoxelBlock voxelBlock = new VoxelBlock();
+        // voxelBlock.name = name;
+        // voxelBlock.description = description;
+        // voxelBlock.topTexture = topTexture;
+        // voxelBlock.leftTexture = leftTexture;
+        // voxelBlock.rightTexture = rightTexture;
+        // voxelBlock.bottomTexture = bottomTexture;
+        // voxelBlock.frontTexture = frontTexture;
+        // voxelBlock.backTexture = backTexture;
 
-        voxelBlock.UVCoordsLeft = UVCoordsLeft;
-        voxelBlock.UVCoordsBottom = UVCoordsBottom;
-        voxelBlock.UVCoordsBack = UVCoordsBack;
-        voxelBlock.UVCoordsFront = UVCoordsFront;
-        voxelBlock.UVCoordsTop = UVCoordsTop;
-        voxelBlock.UVCoordsRight = UVCoordsRight;
-        return voxelBlock;
+        // voxelBlock.UVCoordsLeft = UVCoordsLeft;
+        // voxelBlock.UVCoordsBottom = UVCoordsBottom;
+        // voxelBlock.UVCoordsBack = UVCoordsBack;
+        // voxelBlock.UVCoordsFront = UVCoordsFront;
+        // voxelBlock.UVCoordsTop = UVCoordsTop;
+        // voxelBlock.UVCoordsRight = UVCoordsRight;
+
+        T copy = new T();
+        CopyProperties(this, copy);
+        return copy;
     }
+
+    private void CopyProperties(VoxelBlock source, VoxelBlock destination)
+    {
+        destination.name = source.name;
+        destination.description = source.description;
+        destination.topTexture = source.topTexture;
+        destination.leftTexture = source.leftTexture;
+        destination.rightTexture = source.rightTexture;
+        destination.bottomTexture = source.bottomTexture;
+        destination.frontTexture = source.frontTexture;
+        destination.backTexture = source.backTexture;
+
+        destination.UVCoordsLeft = source.UVCoordsLeft;
+        destination.UVCoordsBottom = source.UVCoordsBottom;
+        destination.UVCoordsBack = source.UVCoordsBack;
+        destination.UVCoordsFront = source.UVCoordsFront;
+        destination.UVCoordsTop = source.UVCoordsTop;
+        destination.UVCoordsRight = source.UVCoordsRight;
+    }
+
+
 }

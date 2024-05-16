@@ -28,9 +28,9 @@ public partial class FlatTerrainGenerator : VoxelGenerator
                     if (globalPosition.Y < MaxTerrainHeight)
                     {
                         if(GD.Randf() < 0.5f){
-                            blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[0].Clone();
+                            blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[0].CloneAs<VoxelBlock>();
                         }else{
-                             blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[1].Clone();
+                             blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[1].CloneAs<VoxelBlock>();
                         }
                     }
                 }

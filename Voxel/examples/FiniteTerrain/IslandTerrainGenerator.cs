@@ -31,7 +31,7 @@ public partial class IslandTerrainGenerator : VoxelGenerator
                             chunkPosition.Z * size + z
                         );
                         if(isInside(globalPosition.X, globalPosition.Y, globalPosition.Z)){
-                            blockList[x, y, z] = voxelWorld.findRegisteredBlockByName("grass").Clone();
+                            blockList[x, y, z] = voxelWorld.findRegisteredBlockByName("grass").CloneAs<VoxelBlock>();
                         }
                     }
                 }

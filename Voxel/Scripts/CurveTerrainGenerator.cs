@@ -43,7 +43,7 @@ public partial class CurveTerrainGenerator : VoxelGenerator
 
                     if (globalPosition.Y < terrainHeight){
                         // Example rule: Assign the first block type to this column
-                        blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[0].Clone();
+                        blockList[x, y, z] = (VoxelBlock)voxelWorld.registeredBlocks[0].CloneAs<VoxelBlock>();
                     }
                 }
             }
