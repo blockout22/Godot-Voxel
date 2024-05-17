@@ -15,6 +15,14 @@ public partial class VoxelChunk
 
     VoxelBuilder builder;
 
+
+    private bool neighborChunkLeft = false;
+    private bool neighborChunkDown = false;
+    private bool neighborChunkBack = false;
+    private bool neighborChunkRight = false;
+    private bool neighborChunkUp = false;
+    private bool neighborChunkFront = false;
+
     public VoxelChunk(VoxelWorld _voxelWorld, Vector3I _grid_position){
         voxelWorld = _voxelWorld;
         this.chunk_position = _grid_position;
@@ -45,6 +53,50 @@ public partial class VoxelChunk
         // }
 
         // build_mesh();
+    }
+
+    private void checkNeighbors(){
+        if(neighborChunkLeft){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X - 1, chunk_position.Y, chunk_position.Z);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if(neighborChunkDown){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y - 1, chunk_position.Z);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if(neighborChunkBack){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y, chunk_position.Z - 1);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if (neighborChunkRight){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X + 1, chunk_position.Y, chunk_position.Z);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if (neighborChunkUp){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y + 1, chunk_position.Z);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
+
+            if (neighborChunkFront){
+                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y, chunk_position.Z + 1);
+                if(neighborChunk != null){
+                    voxelWorld.regenChunk(neighborChunk);
+                }
+            }
     }
 
     public MeshInstance3D buildMesh(VoxelBuilder.LOD lod){
@@ -89,26 +141,34 @@ public partial class VoxelChunk
             instance.Mesh.SurfaceSetMaterial(0, material);
         }
 
+        checkNeighbors();
+        neighborChunkLeft = false;
+        neighborChunkDown = false;
+        neighborChunkBack = false;
+        neighborChunkRight = false;
+        neighborChunkUp = false;
+        neighborChunkFront = false;
+
         return instance;
     }
 
-    private void updateMesh(MeshInstance3D instance, Mesh mesh){
-        instance.Mesh = mesh;
-        GD.Print("Updated to newer mesh: " + instance + " : " + mesh);
-    }
+    // private void updateMesh(MeshInstance3D instance, Mesh mesh){
+    //     instance.Mesh = mesh;
+    //     GD.Print("Updated to newer mesh: " + instance + " : " + mesh);
+    // }
 
-    private void updateEdgeBlock(VoxelChunk chunk){
-        //if any blocks god updated we need to regen the mesh
-        bool hasChanged = false;
-        if(chunk.chunk_position.X < chunk_position.X){
-        // //left neighbor
-            for (int y = 0; y < voxelWorld.chunk_size; y++){
-                for(int z = 0; z < voxelWorld.chunk_size; z++){
+    // private void updateEdgeBlock(VoxelChunk chunk){
+    //     //if any blocks god updated we need to regen the mesh
+    //     bool hasChanged = false;
+    //     if(chunk.chunk_position.X < chunk_position.X){
+    //     // //left neighbor
+    //         for (int y = 0; y < voxelWorld.chunk_size; y++){
+    //             for(int z = 0; z < voxelWorld.chunk_size; z++){
                     
-                }
-            }
-        }
-    }
+    //             }
+    //         }
+    //     }
+    // }
 
     
     // public void updateNeighbor(VoxelChunk chunk){
@@ -121,45 +181,27 @@ public partial class VoxelChunk
 
             //update neighboring chunks
             if(x == 0){
-                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X - 1, chunk_position.Y, chunk_position.Z);
-                if(neighborChunk != null){
-                    voxelWorld.regenChunk(neighborChunk);
-                }
+                neighborChunkLeft = true;
             }
 
             if(y == 0){
-                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y - 1, chunk_position.Z);
-                if(neighborChunk != null){
-                    voxelWorld.regenChunk(neighborChunk);
-                }
+                neighborChunkDown = true;
             }
 
             if(z == 0){
-                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y, chunk_position.Z - 1);
-                if(neighborChunk != null){
-                    voxelWorld.regenChunk(neighborChunk);
-                }
+                neighborChunkBack = true;
             }
 
             if (x == voxelWorld.chunk_size - 1){
-                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X + 1, chunk_position.Y, chunk_position.Z);
-                if(neighborChunk != null){
-                    voxelWorld.regenChunk(neighborChunk);
-                }
+                neighborChunkRight = true;
             }
 
             if (y == voxelWorld.chunk_size - 1){
-                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y + 1, chunk_position.Z);
-                if(neighborChunk != null){
-                    voxelWorld.regenChunk(neighborChunk);
-                }
+                neighborChunkUp = true;
             }
 
             if (z == voxelWorld.chunk_size - 1){
-                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y, chunk_position.Z + 1);
-                if(neighborChunk != null){
-                    voxelWorld.regenChunk(neighborChunk);
-                }
+                neighborChunkFront = true;
             }
             return true;
         }

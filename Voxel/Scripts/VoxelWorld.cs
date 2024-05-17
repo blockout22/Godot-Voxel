@@ -128,7 +128,6 @@ public partial class VoxelWorld : Node
 			int localY = ((y % chunk_size) + chunk_size) % chunk_size;
 			int localZ = ((z % chunk_size) + chunk_size) % chunk_size;
 
-
 			VoxelBlock voxelBlock = chunk.getBlockAt(localX, localY, localZ);
 			return voxelBlock;	
 		}
@@ -386,7 +385,8 @@ public partial class VoxelWorld : Node
 
 	public void regenChunk(VoxelChunk chunk){
 		// RemoveChild(chunk.instance);
-		MeshInstance3D instance = chunk.buildMesh(VoxelBuilder.LOD.HIGH);
+		// MeshInstance3D instance = chunk.buildMesh(VoxelBuilder.LOD.HIGH);
+		loadingChunks.Add(chunk);
 		// AddChild(instance);
 	}
 
