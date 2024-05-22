@@ -77,10 +77,10 @@ public partial class VoxelWorld : Node
 		// 	for(int y = -5; y < 5; y++){
 		// 		for(int z = -5; z < 5; z++){
 
-					VoxelChunk chunk = new VoxelChunk(this, new Vector3I(0, 0, 0));
-					chunk.generate(voxelGenerator);
-					addChunk(chunk);
-					buildAndRenderChunk(chunk);
+					// VoxelChunk chunk = new VoxelChunk(this, new Vector3I(0, 0, 0));
+					// chunk.generate(voxelGenerator);
+					// addChunk(chunk);
+					// buildAndRenderChunk(chunk);
 		// 		}
 		// 	}
 		// }
@@ -360,7 +360,11 @@ public partial class VoxelWorld : Node
 			loadingChunks.RemoveAt(0);
 		}
 
-		Vector3 controllerPos = GetViewport().GetCamera3D().GlobalPosition;
+		Camera3D camera = GetViewport().GetCamera3D();
+		if(camera == null){
+			return;
+		}
+		Vector3 controllerPos = camera.GlobalPosition;
 		Vector3I grid_position = new Vector3I((int)MathF.Floor(controllerPos.X / chunk_size), (int)MathF.Floor(controllerPos.Y / chunk_size), (int)MathF.Floor(controllerPos.Z / chunk_size));
 
 		if(grid_position != lastGridPos){
@@ -370,11 +374,15 @@ public partial class VoxelWorld : Node
 						Vector3I chunk_position = new Vector3I(x, y, z) + grid_position;
 						if(!chunks.ContainsKey(chunk_position)){
 							// create_chunk(chunk_position);
-
-							VoxelChunk chunk = new VoxelChunk(this, chunk_position);
-							chunk.generate(voxelGenerator);
-							addChunk(chunk);
-							buildAndRenderChunk(chunk);
+							if (!Multiplayer.IsServer()){
+								Rpc("request_chunk", chunk_position);
+								//Ask the server what needs rendering in this location
+							}else{
+								VoxelChunk chunk = new VoxelChunk(this, chunk_position);
+								chunk.generate(voxelGenerator);
+								addChunk(chunk);
+								buildAndRenderChunk(chunk);
+							}
 						}
 					}	
 				}
@@ -382,6 +390,59 @@ public partial class VoxelWorld : Node
 			lastGridPos = grid_position;
 		}
     }
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
+	private void request_chunk(Vector3I chunk_position){
+		GD.Print("Requested chunk at: " + chunk_position + " : ");
+		if (Multiplayer.IsServer()){
+			int clientID = Multiplayer.GetRemoteSenderId();
+			VoxelChunk chunk = getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y, chunk_position.Z);
+
+			if(chunk == null){
+				//if the chunk doesn't exist on the server yet then generate the new chunk
+				chunk = new VoxelChunk(this, chunk_position);
+				chunk.generate(voxelGenerator);
+				addChunk(chunk);
+				buildAndRenderChunk(chunk);
+			}
+
+			RpcId(clientID, "UpdateClientChunks", chunk.chunk_position, ToRpcArray(chunk.blockList));
+		}
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true)]
+	public void UpdateClientChunks(Vector3I chunkPos, Godot.Collections.Dictionary blocks){
+		if(!Multiplayer.IsServer()){
+			if(!chunks.ContainsKey(chunkPos)){
+				VoxelChunk chunk = new VoxelChunk(this, chunkPos);
+				for(int x = 0; x < chunk_size; x++){
+					for(int y = 0; y < chunk_size; y++){
+						for(int z = 0; z < chunk_size; z++){
+							string key = x + "," + y + "," + z;
+							if(blocks.ContainsKey(key)){
+								chunk.blockList[x, y, z] = registeredBlocks[0].CloneAs<VoxelBlock>();
+							}
+						}
+					}
+				}
+
+				addChunk(chunk);
+				buildAndRenderChunk(chunk);
+			}
+		}
+	}
+
+	private Godot.Collections.Dictionary ToRpcArray(VoxelBlock[,,] blocks){
+		Godot.Collections.Dictionary dictionary = new Godot.Collections.Dictionary();
+		foreach(var b in blocks){
+			if(b != null){
+				string key = b.localPosition.X + "," + b.localPosition.Y + "," + b.localPosition.Z;
+				dictionary.Add(key, "VoxelBlock");
+			}
+		}
+
+		return dictionary;
+	}
 
 	public void regenChunk(VoxelChunk chunk){
 		// RemoveChild(chunk.instance);

@@ -27,11 +27,10 @@ public partial class VoxelChunk
         voxelWorld = _voxelWorld;
         this.chunk_position = _grid_position;
         blockList = new VoxelBlock[voxelWorld.chunk_size, voxelWorld.chunk_size, voxelWorld.chunk_size];
+        builder = new VoxelBuilder(voxelWorld);
     }
 
     public void generate(VoxelGenerator voxelGenerator){
-        builder = new VoxelBuilder(voxelWorld);
-
         // drawTerrain();
         blockList = voxelGenerator.build(voxelWorld, chunk_position);
 
