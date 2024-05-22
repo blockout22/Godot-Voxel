@@ -39,6 +39,9 @@ public partial class VoxelWorld : Node
 
 	private List<VoxelChunk> loadingChunks = new List<VoxelChunk>();
 
+	//client side chunk requests from the server
+	private Dictionary<Vector3I, float> chunkRequests = new Dictionary<Vector3I, float>();
+
     public override void _Ready()
     {
         base._Ready();
@@ -360,6 +363,19 @@ public partial class VoxelWorld : Node
 			loadingChunks.RemoveAt(0);
 		}
 
+		var currentTime = Time.GetTicksMsec();
+		var keysToRemove = new List<Vector3I>();
+		foreach (var kvp in chunkRequests){
+			if(currentTime > kvp.Value + 5000f){
+				keysToRemove.Add(kvp.Key);
+			}
+		}
+
+		foreach (var key in keysToRemove)
+		{
+			chunkRequests.Remove(key);
+		}
+
 		Camera3D camera = GetViewport().GetCamera3D();
 		if(camera == null){
 			return;
@@ -375,7 +391,11 @@ public partial class VoxelWorld : Node
 						if(!chunks.ContainsKey(chunk_position)){
 							// create_chunk(chunk_position);
 							if (!Multiplayer.IsServer()){
-								Rpc("request_chunk", chunk_position);
+								if(!chunkRequests.ContainsKey(chunk_position))
+								{
+									Rpc("request_chunk", chunk_position);
+									chunkRequests[chunk_position] = Time.GetTicksMsec();
+								}
 								//Ask the server what needs rendering in this location
 							}else{
 								VoxelChunk chunk = new VoxelChunk(this, chunk_position);
@@ -393,7 +413,7 @@ public partial class VoxelWorld : Node
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
 	private void request_chunk(Vector3I chunk_position){
-		GD.Print("Requested chunk at: " + chunk_position + " : ");
+		// GD.Print("Requested chunk at: " + chunk_position + " : ");
 		if (Multiplayer.IsServer()){
 			int clientID = Multiplayer.GetRemoteSenderId();
 			VoxelChunk chunk = getVoxelChunkAtGrid(chunk_position.X, chunk_position.Y, chunk_position.Z);
@@ -422,6 +442,7 @@ public partial class VoxelWorld : Node
 							if(blocks.ContainsKey(key)){
 								VoxelBlock block = findRegisteredBlockByName((string)blocks[key]);
 								chunk.blockList[x, y, z] = block.CloneAs<VoxelBlock>();
+								chunkRequests.Remove(chunkPos);
 							}
 						}
 					}
@@ -435,10 +456,16 @@ public partial class VoxelWorld : Node
 
 	private Godot.Collections.Dictionary ToRpcArray(VoxelBlock[,,] blocks){
 		Godot.Collections.Dictionary dictionary = new Godot.Collections.Dictionary();
-		foreach(var b in blocks){
-			if(b != null){
-				string key = b.localPosition.X + "," + b.localPosition.Y + "," + b.localPosition.Z;
-				dictionary.Add(key, b.name);
+		for(int x = 0; x < blocks.GetLength(0); x++)
+			for(int y = 0; y < blocks.GetLength(1); y++){
+				for(int z = 0; z < blocks.GetLength(2); z++){
+				{
+					VoxelBlock b = blocks[x, y, z];
+					if(b != null){
+						string key = x + "," + y + "," + z;
+						dictionary.Add(key, b.name);
+					}
+				}
 			}
 		}
 
