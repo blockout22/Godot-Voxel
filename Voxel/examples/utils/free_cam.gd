@@ -14,7 +14,17 @@ var pitch = 0
 @export var UP = KEY_E
 @export var DOWN = KEY_Q
 
+func _ready() -> void:
+	current = is_multiplayer_authority()
+	pass
+
+func _enter_tree():
+	set_multiplayer_authority(name.to_int())
+
+@rpc("any_peer")
 func _process(delta: float) -> void:
+	if not is_multiplayer_authority():
+		return;
 	var input_vector = Vector3.ZERO
 	if Input.is_key_pressed(FORWARD):
 		input_vector.z = speed * get_process_delta_time()
