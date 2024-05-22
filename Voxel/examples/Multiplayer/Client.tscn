@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://b5mevyt27cjvx"]
+
+[ext_resource type="Script" path="res://Voxel/examples/utils/free_cam.gd" id="1_07gsm"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_q62eg"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[node name="Camera3D" type="Camera3D"]
+script = ExtResource("1_07gsm")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_q62eg")
