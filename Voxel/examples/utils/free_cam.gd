@@ -22,7 +22,7 @@ func _enter_tree():
 	set_multiplayer_authority(name.to_int())
 
 @rpc("any_peer")
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if not is_multiplayer_authority():
 		return;
 	var input_vector = Vector3.ZERO
@@ -64,7 +64,7 @@ func _input(event):
 		yaw -= event.relative.x * mouse_sensitivity
 		pitch -= event.relative.y * mouse_sensitivity
 		pitch = clamp(pitch, -PI/2, PI/2) # Prevent over-rotation
-		var rotation = Transform3D()
-		rotation.basis = Basis(Vector3(0, 1, 0), yaw)
-		rotation.basis = rotation.basis.rotated(rotation.basis.x, pitch)
-		global_transform = Transform3D(rotation.basis, global_transform.origin)	
+		var rot = Transform3D()
+		rot.basis = Basis(Vector3(0, 1, 0), yaw)
+		rot.basis = rot.basis.rotated(rot.basis.x, pitch)
+		global_transform = Transform3D(rot.basis, global_transform.origin)	
