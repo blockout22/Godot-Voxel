@@ -420,7 +420,8 @@ public partial class VoxelWorld : Node
 						for(int z = 0; z < chunk_size; z++){
 							string key = x + "," + y + "," + z;
 							if(blocks.ContainsKey(key)){
-								chunk.blockList[x, y, z] = registeredBlocks[0].CloneAs<VoxelBlock>();
+								VoxelBlock block = findRegisteredBlockByName((string)blocks[key]);
+								chunk.blockList[x, y, z] = block.CloneAs<VoxelBlock>();
 							}
 						}
 					}
@@ -437,7 +438,7 @@ public partial class VoxelWorld : Node
 		foreach(var b in blocks){
 			if(b != null){
 				string key = b.localPosition.X + "," + b.localPosition.Y + "," + b.localPosition.Z;
-				dictionary.Add(key, "VoxelBlock");
+				dictionary.Add(key, b.name);
 			}
 		}
 
