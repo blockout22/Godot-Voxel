@@ -123,6 +123,21 @@ public partial class VoxelWorld : Node
 		return null;
 	}
 
+	public bool setBlockAt(int x, int y, int z, VoxelBlock voxelBlock){
+		VoxelChunk chunk = getVoxelChunkAt(x, y, z);
+
+		if(chunk != null){
+			int localX = ((x % chunk_size) + chunk_size) % chunk_size;
+			int localY = ((y % chunk_size) + chunk_size) % chunk_size;
+			int localZ = ((z % chunk_size) + chunk_size) % chunk_size;
+			bool addedBlock = chunk.setBlockAt(localX, localY, localZ, voxelBlock);
+			regenChunk(chunk);
+			return addedBlock;
+		}
+
+		return false;
+	}
+
 	public VoxelBlock getVoxelBlockAt(int x, int y, int z){
 		VoxelChunk chunk = getVoxelChunkAt(x, y, z);
 

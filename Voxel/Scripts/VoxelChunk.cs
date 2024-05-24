@@ -208,11 +208,16 @@ public partial class VoxelChunk
         return false;
     }
 
+
     public bool addBlockAt(int x, int y, int z, VoxelBlock voxelBlock){
         if(blockList[x, y, z] != null){
             return false;
         }
 
+        return setBlockAt(x, y, z, voxelBlock);
+    }
+
+    public bool setBlockAt(int x, int y, int z, VoxelBlock voxelBlock){
         //update neighboring chunks
             if(x == 0){
                 neighborChunkLeft = true;
