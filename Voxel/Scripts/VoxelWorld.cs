@@ -359,7 +359,14 @@ public partial class VoxelWorld : Node
         base._Process(delta);
 
 		if(loadingChunks.Count > 0){
-			loadingChunks[0].buildMesh(VoxelBuilder.LOD.HIGH);
+			MeshInstance3D instance = loadingChunks[0].buildMesh(VoxelBuilder.LOD.HIGH);
+			if(instance != null){
+				if(instance.Mesh == null){
+					instance.Hide();
+				}else{
+					instance.Show();
+				}
+			}
 			loadingChunks.RemoveAt(0);
 		}
 
@@ -441,7 +448,8 @@ public partial class VoxelWorld : Node
 							string key = x + "," + y + "," + z;
 							if(blocks.ContainsKey(key)){
 								VoxelBlock block = findRegisteredBlockByName((string)blocks[key]);
-								chunk.blockList[x, y, z] = block.CloneAs<VoxelBlock>();
+								// chunk.blockList[x, y, z] = block.CloneAs<VoxelBlock>();
+								chunk.addBlockAt(x, y, z, block);
 								chunkRequests.Remove(chunkPos);
 							}
 						}

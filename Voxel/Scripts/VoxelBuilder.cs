@@ -508,15 +508,15 @@ public partial class VoxelBuilder
 
     private void drawFromMask(int mask, int x, int y, int z, float scale, Vector2[] topUVS, Vector2[] bottomUVS, Vector2[] frontUVS, Vector2[] backUVS, Vector2[] leftUVS, Vector2[] rightUVS, VoxelChunk chunk){
         Vector3 offset = new Vector3(x, y, z);
-        Mesh mesh = voxelWorld.MASK[mask];
-        if(mesh != null){
-            Dictionary<string, object> data = voxelWorld.extractMeshData(mesh);
+        // Mesh mesh = voxelWorld.MASK[mask];
+        // if(mesh != null){
+        //     Dictionary<string, object> data = voxelWorld.extractMeshData(mesh);
 
-            //TODO draw the correct direction of uvs
-                Vector2[] adjustedUVs = applyUVAdjustment((Vector2[])data["uvs"], topUVS);
-            draw((Vector3[])data["vertices"], (int[])data["indices"], offset, scale, adjustedUVs);
-            return;
-        }
+        //     //TODO draw the correct direction of uvs
+        //         Vector2[] adjustedUVs = applyUVAdjustment((Vector2[])data["uvs"], topUVS);
+        //     draw((Vector3[])data["vertices"], (int[])data["indices"], offset, scale, adjustedUVs);
+        //     return;
+        // }
 
         // int mask = drawSmooth(_mask, offset, uvs);
 

@@ -101,9 +101,9 @@ public partial class VoxelChunk
     public MeshInstance3D buildMesh(VoxelBuilder.LOD lod){
         Mesh mesh = builder.build(this, lod);
         //remove old collision
-        if(mesh == null){
-            return null;
-        }
+        // if(mesh == null){
+        //     return instance;
+        // }
 
         if(instance == null){
             instance = new MeshInstance3D();
@@ -133,8 +133,8 @@ public partial class VoxelChunk
         //     }
         // }
 
-        if (instance != null){
-            instance.Position = new Vector3(chunk_position.X, chunk_position.Y, chunk_position.Z) * voxelWorld.chunk_size;
+        instance.Position = new Vector3(chunk_position.X, chunk_position.Y, chunk_position.Z) * voxelWorld.chunk_size;
+        if (instance.Mesh != null){
             // instance.Scale = new Vector3(0.8f, 0.8f, 0.8f);
             instance.CreateTrimeshCollision();
             instance.Mesh.SurfaceSetMaterial(0, material);
@@ -206,6 +206,40 @@ public partial class VoxelChunk
         }
 
         return false;
+    }
+
+    public bool addBlockAt(int x, int y, int z, VoxelBlock voxelBlock){
+        if(blockList[x, y, z] != null){
+            return false;
+        }
+
+        //update neighboring chunks
+            if(x == 0){
+                neighborChunkLeft = true;
+            }
+
+            if(y == 0){
+                neighborChunkDown = true;
+            }
+
+            if(z == 0){
+                neighborChunkBack = true;
+            }
+
+            if (x == voxelWorld.chunk_size - 1){
+                neighborChunkRight = true;
+            }
+
+            if (y == voxelWorld.chunk_size - 1){
+                neighborChunkUp = true;
+            }
+
+            if (z == voxelWorld.chunk_size - 1){
+                neighborChunkFront = true;
+            }
+            blockList[x, y, z] = voxelBlock;
+
+            return true;
     }
 
     public VoxelBlock getBlockAt(int x, int y, int z){

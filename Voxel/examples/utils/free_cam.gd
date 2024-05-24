@@ -14,6 +14,9 @@ var pitch = 0
 @export var UP = KEY_E
 @export var DOWN = KEY_Q
 
+
+@export var isSinglePlayer: bool = false
+
 func _ready() -> void:
 	current = is_multiplayer_authority()
 	pass
@@ -23,7 +26,7 @@ func _enter_tree():
 
 @rpc("any_peer")
 func _process(_delta: float) -> void:
-	if not is_multiplayer_authority():
+	if not isSinglePlayer and not is_multiplayer_authority():
 		return;
 	var input_vector = Vector3.ZERO
 	if Input.is_key_pressed(FORWARD):
