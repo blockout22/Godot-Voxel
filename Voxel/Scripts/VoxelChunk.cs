@@ -54,6 +54,9 @@ public partial class VoxelChunk
         // build_mesh();
     }
 
+    /**
+    checks the neighbor chunks 
+    */
     private void checkNeighbors(){
         if(neighborChunkLeft){
                 VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk_position.X - 1, chunk_position.Y, chunk_position.Z);

@@ -75,5 +75,119 @@ public partial class VoxelBlock : Resource
         destination.UVCoordsRight = source.UVCoordsRight;
     }
 
+    public VoxelBlock getNeighbor(Neighbor neighbor){
+		VoxelBlock block = null;
+		switch(neighbor){
+			case Neighbor.LEFT_DOWN_BACK:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + -1, globalPosition.Y + -1, globalPosition.Z + -1);
+				break;
+			case Neighbor.LEFT_DOWN:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + -1, globalPosition.Y + -1, globalPosition.Z + 0);
+				break;
+			case Neighbor.LEFT_DOWN_FRONT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + -1, globalPosition.Y + -1, globalPosition.Z + 1);
+				break;
+			case Neighbor.LEFT_BACK:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + -1, globalPosition.Y + 0, globalPosition.Z + -1);
+				break;
+			case Neighbor.LEFT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + -1, globalPosition.Y + 0, globalPosition.Z + 0);
+				break;
+			case Neighbor.LEFT_FRONT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + -1, globalPosition.Y + 0, globalPosition.Z + 1);
+				break;
+			case Neighbor.LEFT_UP_BACK:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + -1, globalPosition.Y + 1, globalPosition.Z + -1);
+				break;
+			case Neighbor.LEFT_UP:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + -1, globalPosition.Y + 1, globalPosition.Z + 0);
+				break;
+			case Neighbor.LEFT_UP_FRONT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + -1, globalPosition.Y + 1, globalPosition.Z + 1);
+				break;
+			case Neighbor.DOWN_BACK:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 0, globalPosition.Y + -1, globalPosition.Z + -1);
+				break;
+			case Neighbor.DOWN:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 0, globalPosition.Y + -1, globalPosition.Z + 0);
+				break;
+			case Neighbor.DOWN_FRONT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 0, globalPosition.Y + -1, globalPosition.Z + 1);
+				break;
+			case Neighbor.BACK:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 0, globalPosition.Y + 0, globalPosition.Z + -1);
+				break;
+			case Neighbor.FRONT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 0, globalPosition.Y + 0, globalPosition.Z + 1);
+				break;
+			case Neighbor.UP_BACK:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 0, globalPosition.Y + 1, globalPosition.Z + -1);
+				break;
+			case Neighbor.UP:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 0, globalPosition.Y + 1, globalPosition.Z + 0);
+				break;
+			case Neighbor.UP_FRONT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 0, globalPosition.Y + 1, globalPosition.Z + 1);
+				break;
+			case Neighbor.RIGHT_DOWN_BACK:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 1, globalPosition.Y + -1, globalPosition.Z + -1);
+				break;
+			case Neighbor.RIGHT_DOWN:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 1, globalPosition.Y + -1, globalPosition.Z + 0);
+				break;
+			case Neighbor.RIGHT_DOWN_FRONT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 1, globalPosition.Y + -1, globalPosition.Z + 1);
+				break;
+			case Neighbor.RIGHT_BACK:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 1, globalPosition.Y + 0, globalPosition.Z + -1);
+				break;
+			case Neighbor.RIGHT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 1, globalPosition.Y + 0, globalPosition.Z + 0);
+				break;
+			case Neighbor.RIGHT_FRONT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 1, globalPosition.Y + 0, globalPosition.Z + 1);
+				break;
+			case Neighbor.RIGHT_UP_BACK:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 1, globalPosition.Y + 1, globalPosition.Z + -1);
+				break;
+			case Neighbor.RIGHT_UP:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 1, globalPosition.Y + 1, globalPosition.Z + 0);
+				break;
+			case Neighbor.RIGHT_UP_FRONT:
+				block = parentChunk.voxelWorld.getVoxelBlockAt(globalPosition.X + 1, globalPosition.Y + 1, globalPosition.Z + 1);
+				break;
+		}
+
+        return block;
+    }
+
+    public enum Neighbor{
+        LEFT_DOWN_BACK, 
+        LEFT_DOWN, 
+        LEFT_DOWN_FRONT, 
+        LEFT_BACK, 
+        LEFT, 
+        LEFT_FRONT, 
+        LEFT_UP_BACK, 
+        LEFT_UP, 
+        LEFT_UP_FRONT, 
+        DOWN_BACK, 
+        DOWN, 
+        DOWN_FRONT, 
+        BACK, 
+        FRONT, 
+        UP_BACK, 
+        UP, 
+        UP_FRONT, 
+        RIGHT_DOWN_BACK, 
+        RIGHT_DOWN, 
+        RIGHT_DOWN_FRONT, 
+        RIGHT_BACK, 
+        RIGHT, 
+        RIGHT_FRONT, 
+        RIGHT_UP_BACK, 
+        RIGHT_UP, 
+        RIGHT_UP_FRONT
+    }
 
 }
