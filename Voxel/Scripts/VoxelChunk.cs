@@ -140,7 +140,7 @@ public partial class VoxelChunk
         if (instance.Mesh != null){
             // instance.Scale = new Vector3(0.8f, 0.8f, 0.8f);
             instance.CreateTrimeshCollision();
-            instance.Mesh.SurfaceSetMaterial(0, material);
+            // instance.Mesh.SurfaceSetMaterial(0, material);
         }
 
         checkNeighbors();

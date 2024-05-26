@@ -1,0 +1,47 @@
+[gd_resource type="VisualShader" load_steps=5 format=3 uid="uid://bf51d8bqtce8m"]
+
+[ext_resource type="Texture2D" uid="uid://cluaex1aecaku" path="res://Voxel/grass_16.png" id="1_hkey0"]
+
+[sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_oj45x"]
+constant = 0.8
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_4wonu"]
+texture = ExtResource("1_hkey0")
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_rah7u"]
+expanded_output_ports = [0]
+input_name = "inv_view_matrix"
+
+[resource]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_lambert, specular_schlick_ggx;
+
+uniform sampler2D tex_frg_2;
+
+
+
+void fragment() {
+// Texture2D:2
+	vec4 n_out2p0 = texture(tex_frg_2, UV);
+
+
+// FloatConstant:10
+	float n_out10p0 = 0.800000;
+
+
+// Output:0
+	ALBEDO = vec3(n_out2p0.xyz);
+	ALPHA = n_out10p0;
+
+
+}
+"
+graph_offset = Vector2(-116, -431)
+nodes/fragment/0/position = Vector2(780, 120)
+nodes/fragment/2/node = SubResource("VisualShaderNodeTexture_4wonu")
+nodes/fragment/2/position = Vector2(340, -140)
+nodes/fragment/9/node = SubResource("VisualShaderNodeInput_rah7u")
+nodes/fragment/9/position = Vector2(-800, 180)
+nodes/fragment/10/node = SubResource("VisualShaderNodeFloatConstant_oj45x")
+nodes/fragment/10/position = Vector2(360, 160)
+nodes/fragment/connections = PackedInt32Array(2, 0, 0, 0, 10, 0, 0, 1)

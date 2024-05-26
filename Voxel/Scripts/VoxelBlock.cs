@@ -10,25 +10,27 @@ public partial class VoxelBlock : Resource
     [Export]
     public String description;
     [Export]
-    public Texture2D topTexture;
-    [Export]
-    public Texture2D bottomTexture;
-    [Export]
-    public Texture2D frontTexture;
-    [Export]
-    public Texture2D backTexture;
-    [Export]
-    public Texture2D leftTexture;
-    [Export]
-    public Texture2D rightTexture;
+    public ShaderMaterial material;
+    // [Export]
+    // public Texture2D topTexture;
+    // [Export]
+    // public Texture2D bottomTexture;
+    // [Export]
+    // public Texture2D frontTexture;
+    // [Export]
+    // public Texture2D backTexture;
+    // [Export]
+    // public Texture2D leftTexture;
+    // [Export]
+    // public Texture2D rightTexture;
 
     // public Rect2 uvCoodds = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
-    public Rect2 UVCoordsLeft = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
-    public Rect2 UVCoordsBottom = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
-    public Rect2 UVCoordsBack = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
-    public Rect2 UVCoordsFront = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
-    public Rect2 UVCoordsTop = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
-    public Rect2 UVCoordsRight = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
+    // public Rect2 UVCoordsLeft = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
+    // public Rect2 UVCoordsBottom = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
+    // public Rect2 UVCoordsBack = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
+    // public Rect2 UVCoordsFront = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
+    // public Rect2 UVCoordsTop = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
+    // public Rect2 UVCoordsRight = new Rect2(new Vector2(0, 0), new Vector2(1, 1));
     public VoxelChunk parentChunk;
     public Vector3I localPosition;
     public Vector3I globalPosition;
@@ -60,19 +62,20 @@ public partial class VoxelBlock : Resource
     {
         destination.name = source.name;
         destination.description = source.description;
-        destination.topTexture = source.topTexture;
-        destination.leftTexture = source.leftTexture;
-        destination.rightTexture = source.rightTexture;
-        destination.bottomTexture = source.bottomTexture;
-        destination.frontTexture = source.frontTexture;
-        destination.backTexture = source.backTexture;
+        destination.material = source.material;
+        // destination.topTexture = source.topTexture;
+        // destination.leftTexture = source.leftTexture;
+        // destination.rightTexture = source.rightTexture;
+        // destination.bottomTexture = source.bottomTexture;
+        // destination.frontTexture = source.frontTexture;
+        // destination.backTexture = source.backTexture;
 
-        destination.UVCoordsLeft = source.UVCoordsLeft;
-        destination.UVCoordsBottom = source.UVCoordsBottom;
-        destination.UVCoordsBack = source.UVCoordsBack;
-        destination.UVCoordsFront = source.UVCoordsFront;
-        destination.UVCoordsTop = source.UVCoordsTop;
-        destination.UVCoordsRight = source.UVCoordsRight;
+        // destination.UVCoordsLeft = source.UVCoordsLeft;
+        // destination.UVCoordsBottom = source.UVCoordsBottom;
+        // destination.UVCoordsBack = source.UVCoordsBack;
+        // destination.UVCoordsFront = source.UVCoordsFront;
+        // destination.UVCoordsTop = source.UVCoordsTop;
+        // destination.UVCoordsRight = source.UVCoordsRight;
     }
 
     public VoxelBlock getNeighbor(Neighbor neighbor){
