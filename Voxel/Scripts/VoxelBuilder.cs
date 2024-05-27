@@ -43,50 +43,50 @@ public partial class VoxelBuilder
 
     private static readonly Vector2[] DefaultTopUVs = new Vector2[]
     {
-        new Vector2(0, 0),
-        new Vector2(1, 0),
-        new Vector2(1, 1),
-        new Vector2(0, 1)
+        new Vector2(0.0f / 3.0f, 2.0f / 3.0f), // Bottom-left
+        new Vector2(1.0f / 3.0f, 2.0f / 3.0f), // Bottom-right
+        new Vector2(1.0f / 3.0f, 1.0f),        // Top-right
+        new Vector2(0.0f / 3.0f, 1.0f)         // Top-left
     };
 
     private static readonly Vector2[] DefaultBottomUVs = new Vector2[]
     {
-        new Vector2(0, 0),
-        new Vector2(1, 0),
-        new Vector2(1, 1),
-        new Vector2(0, 1)
+        new Vector2(1.0f / 3.0f, 2.0f / 3.0f), // Bottom-left
+        new Vector2(2.0f / 3.0f, 2.0f / 3.0f), // Bottom-right
+        new Vector2(2.0f / 3.0f, 1.0f),        // Top-right
+        new Vector2(1.0f / 3.0f, 1.0f)         // Top-left
     };
 
     private static readonly Vector2[] DefaultFrontUVs = new Vector2[]
     {
-        new Vector2(0, 0),
-        new Vector2(1, 0),
-        new Vector2(1, 1),
-        new Vector2(0, 1)
+        new Vector2(2.0f / 3.0f, 2.0f / 3.0f), // Bottom-left
+        new Vector2(3.0f / 3.0f, 2.0f / 3.0f), // Bottom-right
+        new Vector2(3.0f / 3.0f, 1.0f),        // Top-right
+        new Vector2(2.0f / 3.0f, 1.0f)         // Top-left
     };
 
     private static readonly Vector2[] DefaultBackUVs = new Vector2[]
     {
-        new Vector2(0, 0),
-        new Vector2(1, 0),
-        new Vector2(1, 1),
-        new Vector2(0, 1)
+        new Vector2(0.0f / 3.0f, 0.0f), // Bottom-left
+        new Vector2(1.0f / 3.0f, 0.0f), // Bottom-right
+        new Vector2(1.0f / 3.0f, 1.0f / 3.0f), // Top-right
+        new Vector2(0.0f / 3.0f, 1.0f / 3.0f)  // Top-left
     };
 
     private static readonly Vector2[] DefaultLeftUVs = new Vector2[]
     {
-        new Vector2(0, 0),
-        new Vector2(1, 0),
-        new Vector2(1, 1),
-        new Vector2(0, 1)
+        new Vector2(1.0f / 3.0f, 0.0f), // Bottom-left
+        new Vector2(2.0f / 3.0f, 0.0f), // Bottom-right
+        new Vector2(2.0f / 3.0f, 1.0f / 3.0f), // Top-right
+        new Vector2(1.0f / 3.0f, 1.0f / 3.0f)  // Top-left
     };
 
     private static readonly Vector2[] DefaultRightUVs = new Vector2[]
     {
-        new Vector2(0, 0),
-        new Vector2(1, 0),
-        new Vector2(1, 1),
-        new Vector2(0, 1)
+        new Vector2(2.0f / 3.0f, 0.0f), // Bottom-left
+        new Vector2(3.0f / 3.0f, 0.0f), // Bottom-right
+        new Vector2(3.0f / 3.0f, 1.0f / 3.0f), // Top-right
+        new Vector2(2.0f / 3.0f, 1.0f / 3.0f)  // Top-left
     };
 
     public VoxelBuilder(VoxelWorld _voxelWorld){
@@ -111,29 +111,18 @@ public partial class VoxelBuilder
                     if (block != null){
                         block.parentChunk = chunk;
                         block.localPosition = new Vector3I(x, y, z);
-                        int neighbors = getNeighbors(chunk, x, y, z);                        
-
-                        // Vector2[] topUVS = createFaceUVs(block.UVCoordsTop);
-                        // Vector2[] bottomUVS = (block.bottomTexture != null) ? createFaceUVs(block.UVCoordsBottom) : topUVS;
-                        // Vector2[] frontUVS = (block.frontTexture != null) ? createFaceUVs(block.UVCoordsFront) : topUVS;
-                        // Vector2[] backUVS = (block.backTexture != null) ? createFaceUVs(block.UVCoordsBack) : topUVS;
-                        // Vector2[] leftUVS = (block.leftTexture != null) ? createFaceUVs(block.UVCoordsLeft) : topUVS;
-                        // Vector2[] rightUVS = (block.rightTexture != null) ? createFaceUVs(block.UVCoordsRight) : topUVS;
-
-                        // int mask = getNeighborsMask(neighbors);
-
-                        // //left = 1, bottom = 2, back = 4, front = 8, top = 16, right = 32
-                        // object[] testMask = new object[6]{false, false, false, false, false, false};
-                        // int test = getNeighborsMask(testMask);
-                        // GD.Print(test);
-                        // string toPint = "";
-                        // for (int i = 0; i < neighbors.GetLength(0); i++){
-                            // toPint += (neighbors[i] is bool ? "false" : "true") + " ";
-                        // }
-                        // GD.Print(mask + " : " +  getNeighborsMask(testMask));
+                        int neighbors = getNeighbors(chunk, x, y, z);           
+                        switch(lod){
+                            case LOD.LOW:
+                                break;
+                            case LOD.MED:
+                                drawFromMask(block, neighbors, x + 0.5f, y + 0.5f, z + 0.5f, lodScale, DefaultTopUVs, DefaultBottomUVs, DefaultFrontUVs, DefaultBackUVs, DefaultLeftUVs, DefaultRightUVs, chunk);
+                                break;
+                            case LOD.HIGH:
+                                drawFromMask(block, neighbors, x, y, z, lodScale, DefaultTopUVs, DefaultBottomUVs, DefaultFrontUVs, DefaultBackUVs, DefaultLeftUVs, DefaultRightUVs, chunk);
+                                break;
+                        }
                         
-
-                        drawFromMask(block, neighbors, x, y, z, lodScale, DefaultTopUVs, DefaultBottomUVs, DefaultFrontUVs, DefaultBackUVs, DefaultLeftUVs, DefaultRightUVs, chunk);
                     }
                 }
             }
@@ -565,7 +554,7 @@ public partial class VoxelBuilder
         }
     }
 
-    private void drawFromMask(VoxelBlock block, int mask, int x, int y, int z, float scale, Vector2[] topUVS, Vector2[] bottomUVS, Vector2[] frontUVS, Vector2[] backUVS, Vector2[] leftUVS, Vector2[] rightUVS, VoxelChunk chunk){
+    private void drawFromMask(VoxelBlock block, int mask, float x, float y, float z, float scale, Vector2[] topUVS, Vector2[] bottomUVS, Vector2[] frontUVS, Vector2[] backUVS, Vector2[] leftUVS, Vector2[] rightUVS, VoxelChunk chunk){
         Vector3 offset = new Vector3(x, y, z);
         // Mesh mesh = voxelWorld.MASK[mask];
         // if(mesh != null){

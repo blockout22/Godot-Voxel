@@ -103,44 +103,24 @@ public partial class VoxelChunk
 
     public MeshInstance3D buildMesh(VoxelBuilder.LOD lod){
         Mesh mesh = builder.build(this, lod);
-        //remove old collision
-        // if(mesh == null){
-        //     return instance;
-        // }
 
         if(instance == null){
             instance = new MeshInstance3D();
         }else{
-            Array<Node> chilren = instance.GetChildren();
+            Array<Node> children = instance.GetChildren();
 
-            foreach(Node node in chilren){
+            foreach(Node node in children){
                 if(node is StaticBody3D){
                     instance.RemoveChild(node);
-
                     break;
                 }
             }
         }
         instance.Mesh = mesh;
 
-        // for(int x = 0; x < blockList.GetLength(0); x++){
-        //     for(int y = 0; y < blockList.GetLength(1); y++){
-        //         for(int z = 0; z < blockList.GetLength(2); z++){
-        //             VoxelBlock block = blockList[x, y, z];
-
-        //             if(block != null){
-        //                 block.parentChunk = this;
-        //                 block.localPosition = new Vector3I(x, y, z);
-        //             } 
-        //         }
-        //     }
-        // }
-
         instance.Position = new Vector3(chunk_position.X, chunk_position.Y, chunk_position.Z) * voxelWorld.chunk_size;
         if (instance.Mesh != null){
-            // instance.Scale = new Vector3(0.8f, 0.8f, 0.8f);
             instance.CreateTrimeshCollision();
-            // instance.Mesh.SurfaceSetMaterial(0, material);
         }
 
         checkNeighbors();
