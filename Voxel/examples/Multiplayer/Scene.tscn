@@ -1,10 +1,10 @@
 [gd_scene load_steps=14 format=3 uid="uid://cfkn12qtqjk2s"]
 
 [ext_resource type="Script" path="res://Voxel/Scripts/VoxelWorld.cs" id="1_rk2c8"]
-[ext_resource type="Script" path="res://Voxel/Scripts/VoxelBlock.cs" id="2_rhqoe"]
+[ext_resource type="Script" path="res://Voxel/Scripts/Blocks/VoxelBlock.cs" id="2_rhqoe"]
 [ext_resource type="Texture2D" uid="uid://cluaex1aecaku" path="res://Voxel/grass_16.png" id="3_xpkfd"]
 [ext_resource type="Texture2D" uid="uid://cp4khwj8rwn14" path="res://Voxel/sand.png" id="4_p1cke"]
-[ext_resource type="Script" path="res://Voxel/Scripts/HillsTerrainGenerator.cs" id="5_1634g"]
+[ext_resource type="Script" path="res://Voxel/Scripts/Generators/HillsTerrainGenerator.cs" id="5_1634g"]
 [ext_resource type="PackedScene" uid="uid://b5mevyt27cjvx" path="res://Voxel/examples/Multiplayer/Client.tscn" id="7_fkojh"]
 [ext_resource type="Script" path="res://Voxel/examples/Multiplayer/Multiplayer.cs" id="7_ima64"]
 
