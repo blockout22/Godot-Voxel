@@ -15,7 +15,6 @@ public partial class VoxelChunk
 
     VoxelBuilder builder;
 
-
     private bool neighborChunkLeft = false;
     private bool neighborChunkDown = false;
     private bool neighborChunkBack = false;

@@ -67,7 +67,7 @@ public partial class SphereTerrainGenerator : VoxelGenerator
 
                                 if (distance <= SphereRadius)
                                 {
-                                    blockList[localX, localY, localZ] = (VoxelBlock)voxelWorld.registeredBlocks[0];
+                                    blockList[localX, localY, localZ] = (VoxelBlock)voxelWorld.registeredBlocks[0].CloneAs<VoxelBlock>();
                                 }
                             }
                         }

@@ -18,7 +18,7 @@ vec2 remapUVS(vec2 minUV, vec2 maxUV)
 }
 
 void fragment() {
-	 vec4 color = vec4(1.0, 1.0, 1.0, 1.0); // Default color (black)
+	vec4 color = vec4(1.0, 1.0, 1.0, 1.0); // Default color (black)
 	
 	vec4 topSide = texture(topTexture, remapUVS(vec2(0.0, 2.0 / 3.0), vec2(1.0 / 3.0, 1.0)));
 	vec4 bottomSide = texture(bottomTexture, remapUVS(vec2(1.0 / 3.0, 2.0 / 3.0), vec2(2.0 / 3.0, 1.0)));

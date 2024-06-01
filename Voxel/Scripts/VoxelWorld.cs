@@ -1,8 +1,10 @@
 using Godot;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 public partial class VoxelWorld : Node
 {
@@ -41,6 +43,11 @@ public partial class VoxelWorld : Node
 
 	//client side chunk requests from the server
 	private Dictionary<Vector3I, float> chunkRequests = new Dictionary<Vector3I, float>();
+
+	// Limit the number of concurrent tasks
+	const int maxConcurrency = 4; // Adjust this number based on the system capabilities
+	SemaphoreSlim semaphore = new SemaphoreSlim(maxConcurrency);
+	ConcurrentQueue<Task> tasks = new ConcurrentQueue<Task>();
 
     public override void _Ready()
     {
@@ -93,11 +100,96 @@ public partial class VoxelWorld : Node
 		// }
 
 		ulong endTime = Time.GetTicksMsec() - startTime;
+		initialGeneration();
         GD.Print("Chunk Build time: " + endTime);
 		// create_chunk(new Vector3I(0, -1, 0));
 		// create_chunk(new Vector3I(1, -1,  0));
 		// getVoxelChunkAtGrid(1, -1,  0);
     }
+
+	private async void initialGeneration(){
+		Vector3I grid_position = new Vector3I(0, 0, 0);
+		Vector3I min = new Vector3I(-5, -1, -5);
+		Vector3I max = new Vector3I(5, 2, 5);
+		SortedList<float, Vector3I> positions = new SortedList<float, Vector3I>();
+
+		Vector3I center = new Vector3I((min.X + max.X) / 2, (min.Y + max.Y) / 2, (min.Z + max.Z) / 2);
+
+		 for (int x = min.X; x < max.X; x++)
+		{
+			for (int y = min.Y; y < max.Y; y++)
+			{
+				for (int z = min.Z; z < max.Z; z++)
+				{
+					Vector3I chunk_position = new Vector3I(x, y, z);
+					float distance = chunk_position.DistanceTo(center);
+					// Use distance as key to sort
+					if (!positions.ContainsKey(distance))
+					{
+						positions.Add(distance, chunk_position);
+					}
+					else
+					{
+						// Ensure unique keys in SortedList by slightly adjusting distance
+						float adjustedDistance = distance + 0.0001f;
+						while (positions.ContainsKey(adjustedDistance))
+						{
+							adjustedDistance += 0.0001f;
+						}
+						positions.Add(adjustedDistance, chunk_position);
+					}
+				}
+			}
+		}
+
+		foreach (var kvp in positions)
+		{
+			Vector3I chunk_position = kvp.Value + grid_position;
+			if (!chunks.ContainsKey(chunk_position))
+			{
+				// create_chunk(chunk_position);
+				if (!Multiplayer.IsServer())
+				{
+					if (!chunkRequests.ContainsKey(chunk_position))
+					{
+						Rpc("request_chunk", chunk_position);
+						chunkRequests[chunk_position] = Time.GetTicksMsec();
+					}
+					// Ask the server what needs rendering in this location
+				}
+				else
+				{
+					GenerateChunks(chunk_position);
+					// await semaphore.WaitAsync();
+
+					// tasks.Enqueue(Task.Run(async () => {
+					// 	try{
+					// 		await GenerateChunks(chunk_position);
+					// 	}finally{
+					// 		semaphore.Release();
+					// 	}
+					// }));
+				}
+			}
+		}
+	}
+
+	private async Task GenerateChunks(Vector3I chunk_pos){
+		VoxelChunk chunk = new VoxelChunk(this, chunk_pos);
+		addChunk(chunk);
+		await semaphore.WaitAsync();
+		tasks.Enqueue(Task.Run(async () => {
+			try{
+				// await GenerateChunks(chunk_position);
+				await Task.Yield();
+				
+				chunk.generate(voxelGenerator);
+				buildAndRenderChunk(chunk);
+		}finally{
+				semaphore.Release();
+			}
+		}));
+	}
 
 	// takes in global world coords and returns the chunk 
 	public VoxelChunk getVoxelChunkAt(int x, int y, int z){
@@ -420,18 +512,108 @@ public partial class VoxelWorld : Node
 								}
 								//Ask the server what needs rendering in this location
 							}else{
-								VoxelChunk chunk = new VoxelChunk(this, chunk_position);
-								chunk.generate(voxelGenerator);
-								addChunk(chunk);
-								buildAndRenderChunk(chunk);
+								// VoxelChunk chunk = new VoxelChunk(this, chunk_position);
+								// chunk.generate(voxelGenerator);
+								// // addChunk(chunk);
+								// // buildAndRenderChunk(chunk);
+								GenerateChunks(chunk_position);
 							}
 						}
 					}	
 				}
 			}
+			
+			// Vector3 chunkposition = camera.Position + direction * camera.Far;
+			// Vector3[] chunk = chunkBounds(chunkposition); // clamp and check in increments of chunk_size
+			// foreach(var point in chunk){
+			// 	camera.IsPositionInFrustum(point);
+			// }
+
 			lastGridPos = grid_position;
 		}
+
+		// float VIEW_DISTANCE = 25;
+
+		// Vector3I[] visibleGridPositions = CalculateVisibleGrids(camera, VIEW_DISTANCE);
+
+		// foreach(Vector3I pos in visibleGridPositions){
+		// 	if(!chunks.ContainsKey(pos / chunk_size)){
+		// 		VoxelChunk chunk = new VoxelChunk(this, pos / chunk_size);
+		// 		chunk.generate(voxelGenerator);
+		// 		addChunk(chunk);
+		// 		buildAndRenderChunk(chunk);
+		// 	}
+		// }
     }
+
+	private Vector3I[] CalculateVisibleGrids(Camera3D camera, float VIEW_DISTANCE)
+    {
+        // Get the camera's vertical FOV in radians
+        float fovRadians = Mathf.DegToRad(camera.Fov);
+        
+        // Get the viewport size to calculate the aspect ratio
+        Rect2 viewportRect = GetViewport().GetVisibleRect();
+        float viewportWidth = viewportRect.Size.X;
+        float viewportHeight = viewportRect.Size.Y;
+        float aspectRatio = viewportWidth / viewportHeight;
+
+        // Calculate the height and width of the far plane
+        float farPlaneHeight = 2 * VIEW_DISTANCE * Mathf.Tan(fovRadians / 2);
+        float farPlaneWidth = farPlaneHeight * aspectRatio;
+
+        // Convert the dimensions to grid units
+        int numGridsWidth = Mathf.CeilToInt(farPlaneWidth / chunk_size);
+        int numGridsHeight = Mathf.CeilToInt(farPlaneHeight / chunk_size);
+
+        // Calculate the positions of each grid square
+        List<Vector3I> gridPositions = new List<Vector3I>();
+
+        for (int y = 0; y < numGridsHeight; y++)
+        {
+            for (int x = 0; x < numGridsWidth; x++)
+            {
+                // Calculate the world position of the grid square
+                float xPos = (x - numGridsWidth / 2) * chunk_size;
+                float yPos = (y - numGridsHeight / 2) * chunk_size;
+                Vector3 gridPosition = camera.GlobalTransform.Origin + (-camera.GlobalTransform.Basis.Z * VIEW_DISTANCE) + (camera.GlobalTransform.Basis.X * xPos) + (camera.GlobalTransform.Basis.Y * yPos);
+
+				Vector3I chunkPos = AlignToChunkSize(gridPosition);
+				Vector3[] corners = chunkBounds(chunkPos);
+                
+                foreach(Vector3 corner in corners){
+					if(camera.IsPositionInFrustum(corner)){
+						gridPositions.Add(chunkPos);
+						break;
+					}
+				}
+            }
+        }
+
+        return gridPositions.ToArray();
+    }
+
+	private Vector3I AlignToChunkSize(Vector3 position)
+    {
+        return new Vector3I(
+            (int)(Mathf.Floor(position.X / chunk_size) * chunk_size),
+            (int)(Mathf.Floor(position.Y / chunk_size) * chunk_size),
+            (int)(Mathf.Floor(position.Z / chunk_size) * chunk_size)
+        );
+    }
+
+	private Vector3[] chunkBounds(Vector3 position){
+		return new Vector3[] {
+			position,
+			position + new Vector3(chunk_size, 0, 0),
+			position + new Vector3(0, chunk_size, 0),
+			position + new Vector3(0, 0, chunk_size),
+			position + new Vector3(chunk_size, chunk_size, chunk_size),
+			position + new Vector3(chunk_size, chunk_size, 0),
+			position + new Vector3(chunk_size, 0, chunk_size),
+			position + new Vector3(0, chunk_size, chunk_size)
+		};
+	}
+
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
 	private void request_chunk(Vector3I chunk_position){
@@ -521,7 +703,8 @@ public partial class VoxelWorld : Node
 		MeshInstance3D instance = _chunk.buildMesh(VoxelBuilder.LOD.LOW);
 		loadingChunks.Add(_chunk);
 		if (instance != null){
-			AddChild(instance);
+			// AddChild(instance);
+			CallDeferred("add_child", instance);
 		}
 
 		// ThreadPool.QueueUserWorkItem(_ =>

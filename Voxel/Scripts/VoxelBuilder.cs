@@ -28,13 +28,42 @@ public partial class VoxelBuilder
         2, 3, 0
     };
 
+    // Vector3I[] NEIGHBOR_OFFSETS = {
+    //     new Vector3I(-1, 0, 0),  // Left neighbor
+    //     new Vector3I(0, -1, 0),  // Bottom neighbor
+    //     new Vector3I(0, 0, -1),  // Back neighbor
+    //     new Vector3I(0, 0, 1),   // Front neighbor
+    //     new Vector3I(0, 1, 0),   // Top neighbor
+    //     new Vector3I(1, 0, 0),   // Right neighbor
+    // };
+    
     Vector3I[] NEIGHBOR_OFFSETS = {
-        new Vector3I(-1, 0, 0),  // Left neighbor
-        new Vector3I(0, -1, 0),  // Bottom neighbor
-        new Vector3I(0, 0, -1),  // Back neighbor
-        new Vector3I(0, 0, 1),   // Front neighbor
-        new Vector3I(0, 1, 0),   // Top neighbor
-        new Vector3I(1, 0, 0),   // Right neighbor
+        new Vector3I(-1, -1, -1), //LEFT_DOWN_BACK: 0
+        new Vector3I(-1, -1, 0), //LEFT_DOWN: 1
+        new Vector3I(-1, -1, 1), //LEFT_DOWN_FRONT: 2
+        new Vector3I(-1, 0, -1), //LEFT_BACK: 3
+        new Vector3I(-1, 0, 0), //LEFT: 4
+        new Vector3I(-1, 0, 1), //LEFT_FRONT: 5
+        new Vector3I(-1, 1, -1), //LEFT_UP_BACK: 6
+        new Vector3I(-1, 1, 0), //LEFT_UP: 7
+        new Vector3I(-1, 1, 1), //LEFT_UP_FRONT: 8
+        new Vector3I(0, -1, -1), //DOWN_BACK: 9
+        new Vector3I(0, -1, 0), //DOWN: 10
+        new Vector3I(0, -1, 1), //DOWN_FRONT: 11
+        new Vector3I(0, 0, -1), //BACK: 12
+        new Vector3I(0, 0, 1), //FRONT: 13
+        new Vector3I(0, 1, -1), //UP_BACK: 14
+        new Vector3I(0, 1, 0), //UP: 15
+        new Vector3I(0, 1, 1), //UP_FRONT: 16
+        new Vector3I(1, -1, -1), //RIGHT_DOWN_BACK: 17
+        new Vector3I(1, -1, 0), //RIGHT_DOWN: 18
+        new Vector3I(1, -1, 1), //RIGHT_DOWN_FRONT: 19
+        new Vector3I(1, 0, -1), //RIGHT_BACK: 20
+        new Vector3I(1, 0, 0), //RIGHT: 21
+        new Vector3I(1, 0, 1), //RIGHT_FRONT: 22
+        new Vector3I(1, 1, -1), //RIGHT_UP_BACK: 23
+        new Vector3I(1, 1, 0), //RIGHT_UP: 24
+        new Vector3I(1, 1, 1), //RIGHT_UP_FRONT: 25
     };
 
     // SurfaceTool surfaceTool;
@@ -554,6 +583,26 @@ public partial class VoxelBuilder
         }
     }
 
+    private Vector3 CalculateDirectionVector(int mask)
+    {
+        Vector3 direction = Vector3.Zero;
+
+        for (int i = 0; i < NEIGHBOR_OFFSETS.Length; i++)
+        {
+            if ((mask & (1 << i)) != 0)
+            {
+                direction += new Vector3(NEIGHBOR_OFFSETS[i].X, NEIGHBOR_OFFSETS[i].Y, NEIGHBOR_OFFSETS[i].Z);
+            }
+        }
+
+        if (direction != Vector3.Zero)
+        {
+            direction = direction.Normalized();;
+        }
+
+        return direction;
+    }
+
     private void drawFromMask(VoxelBlock block, int mask, float x, float y, float z, float scale, Vector2[] topUVS, Vector2[] bottomUVS, Vector2[] frontUVS, Vector2[] backUVS, Vector2[] leftUVS, Vector2[] rightUVS, VoxelChunk chunk){
         Vector3 offset = new Vector3(x, y, z);
         // Mesh mesh = voxelWorld.MASK[mask];
@@ -571,6 +620,9 @@ public partial class VoxelBuilder
         // Vector3 direction = CalculateDirection(mask);
         // float strength = 0.5f;
 
+        Vector3 direction = CalculateDirection(mask);
+
+
         VoxelSurface voxelSurface = null;
         if(!surfaces.ContainsKey(block.material)){
             voxelSurface = new VoxelSurface(block);
@@ -579,42 +631,69 @@ public partial class VoxelBuilder
             voxelSurface = surfaces[block.material];
         }
 
-        if ((mask & 1 << 0) == 0){
+        if ((mask & 1 << 4) == 0){
             FACES.TryGetValue("left", out Vector3[] verts);
             // Vector3[] copy = DeepCopyVectorArray(verts);
+
+            // for(int i = 0; i < copy.Length; i++){
+            //     Vector3 original = copy[i];
+
+            //     // Calculate the direction from the vertex to the origin
+            //     Vector3 directionToOrigin = -original.Normalized();
+
+            //     Vector3 axis = direction.Cross(directionToOrigin).Normalized();
+            //     float angle = Mathf.Acos(direction.Dot(directionToOrigin));
+            //     Quaternion rotation = new Quaternion(axis, angle);
+
+            //     // Rotate the move direction to align it towards the origin
+            //     Vector3 rotatedDirection = rotation * direction * 0.2f;
+
+            //     // Move the vertices towards the rotated direction
+            //     float adjustedX = original.X + rotatedDirection.X;
+            //     float adjustedY = original.Y + rotatedDirection.Y;
+            //     float adjustedZ = original.Z + rotatedDirection.Z;
+
+            //     // Clamp the vertices within the bounds of the original position
+            //     copy[i].X = Math.Clamp(adjustedX, Math.Min(original.X, adjustedX), Math.Max(original.X, adjustedX));
+            //     copy[i].Y = Math.Clamp(adjustedY, Math.Min(original.Y, adjustedY), Math.Max(original.Y, adjustedY));
+            //     copy[i].Z = Math.Clamp(adjustedZ, Math.Min(original.Z, adjustedZ), Math.Max(original.Z, adjustedZ));
+            // }
+
+            // GD.Print(verts[0] + " : " + copy[0]);
+
             // moveVerticesDirection(copy, direction, strength);
             draw(voxelSurface, verts, CUBE_INDICES, offset, scale, leftUVS);
         }
 
-        if ((mask & 1 << 1) == 0){
+        if ((mask & 1 << 10) == 0){
             FACES.TryGetValue("bottom", out Vector3[] verts);
             // Vector3[] copy = DeepCopyVectorArray(verts);
             // moveVerticesDirection(copy, direction, strength);
             draw(voxelSurface, verts, CUBE_INDICES, offset, scale, bottomUVS);
         }
 
-        if ((mask & 1 << 2) == 0){
+        if ((mask & 1 << 12) == 0){
             FACES.TryGetValue("back", out Vector3[] verts);
             // Vector3[] copy = DeepCopyVectorArray(verts);
             // moveVerticesDirection(copy, direction, strength);
             draw(voxelSurface, verts, CUBE_INDICES, offset, scale, backUVS);
         }
 
-        if ((mask & 1 << 3) == 0){
+        if ((mask & 1 << 13) == 0){
             FACES.TryGetValue("front", out Vector3[] verts);
             // Vector3[] copy = DeepCopyVectorArray(verts);
             // moveVerticesDirection(copy, direction, strength);
             draw(voxelSurface, verts, CUBE_INDICES, offset, scale, frontUVS);
         }
 
-        if ((mask & 1 << 4) == 0){
+        if ((mask & 1 << 15) == 0){
             FACES.TryGetValue("top", out Vector3[] verts);
             // Vector3[] copy = DeepCopyVectorArray(verts);
             // moveVerticesDirection(copy, direction, strength);
             draw(voxelSurface, verts, CUBE_INDICES, offset, scale, topUVS);
         }
 
-        if ((mask & 1 << 5) == 0){
+        if ((mask & 1 << 21) == 0){
             FACES.TryGetValue("right", out Vector3[] verts);
             // Vector3[] copy = DeepCopyVectorArray(verts);
             // moveVerticesDirection(copy, direction, strength);
