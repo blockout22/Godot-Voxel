@@ -17,22 +17,46 @@ vec2 remapUVS(vec2 minUV, vec2 maxUV)
 	return vec2((v_UV.x - minUV.x) / (maxUV.x - minUV.x), (v_UV.y - minUV.y) / (maxUV.y - minUV.y));
 }
 
+bool uvInBounds(vec2 minUV, vec2 maxUV){
+	return v_UV.x >= minUV.x && v_UV.x < maxUV.x && v_UV.y >= minUV.y && v_UV.y <= maxUV.y;
+}
+
 void fragment() {
-	vec4 color = vec4(1.0, 1.0, 1.0, 1.0); // Default color (black)
+	vec4 color = vec4(1.0, 1.0, 1.0, 1.0);
 	
-	vec4 topSide = texture(topTexture, remapUVS(vec2(0.0, 2.0 / 3.0), vec2(1.0 / 3.0, 1.0)));
-	vec4 bottomSide = texture(bottomTexture, remapUVS(vec2(1.0 / 3.0, 2.0 / 3.0), vec2(2.0 / 3.0, 1.0)));
-	vec4 frontSide = texture(frontTexture, remapUVS(vec2(2.0 / 3.0, 2.0 / 3.0), vec2(1.0, 1.0)));
-	vec4 backSide = texture(backTexture, remapUVS(vec2(0.0, 0.0), vec2(1.0 / 3.0, 1.0 / 3.0)));
-	vec4 leftSide = texture(leftTexture, remapUVS(vec2(1.0 / 3.0, 0.0), vec2(2.0 / 3.0, 1.0 / 3.0)));
-	vec4 rightSide = texture(rightTexture, remapUVS(vec2(2.0 / 3.0, 0.0), vec2(1.0, 1.0 / 3.0)));
+	vec2 topMinUV = vec2(0.0, 2.0 / 3.0);
+	vec2 topMaxUV = vec2(1.0 / 3.0, 1.0);
+	vec2 bottomMinUV = vec2(1.0 / 3.0, 2.0 / 3.0);
+	vec2 bottomMaxUV = vec2(2.0 / 3.0, 1.0);
+	vec2 frontMinUV = vec2(2.0 / 3.0, 2.0 / 3.0);
+	vec2 frontMaxUV = vec2(1.0, 1.0);
+	vec2 backMinUV = vec2(0.0, 0.0);
+	vec2 backMaxUV = vec2(1.0 / 3.0, 1.0 / 3.0);
+	vec2 leftMinUV = vec2(1.0 / 3.0, 0.0);
+	vec2 leftMaxUV = vec2(2.0 / 3.0, 1.0 / 3.0);
+	vec2 rightMinUV = vec2(2.0 / 3.0, 0.0);
+	vec2 rightMaxUV = vec2(1.0, 1.0 / 3.0);
+	
+	vec2 topUVS = remapUVS(topMinUV, topMaxUV);
+	vec2 bottomUVS = remapUVS(bottomMinUV, bottomMaxUV);
+	vec2 frontUVS = remapUVS(frontMinUV, frontMaxUV);
+	vec2 backUVS = remapUVS(backMinUV, backMaxUV);
+	vec2 leftUVS = remapUVS(leftMinUV, leftMaxUV);
+	vec2 rightUVS = remapUVS(rightMinUV, rightMaxUV);
+	
+	vec4 topSide = texture(topTexture, topUVS);
+	vec4 bottomSide = texture(bottomTexture, bottomUVS);
+	vec4 frontSide = texture(frontTexture, frontUVS);
+	vec4 backSide = texture(backTexture, backUVS);
+	vec4 leftSide = texture(leftTexture, leftUVS);
+	vec4 rightSide = texture(rightTexture, rightUVS);
 
     // Top face: (0, 2/3) to (1/3, 1)
-    if(v_UV.x >= 0.0 && v_UV.x < 1.0 / 3.0 && v_UV.y >= 2.0 / 3.0 && v_UV.y <= 1.0){
+    if(uvInBounds(topMinUV, topMaxUV)){
 		color = topSide;
     }
 	//Left face
-	else if(v_UV.x >= 1.0 / 3.0 && v_UV.x < 2.0 / 3.0 && v_UV.y >= 0.0 && v_UV.y < 1.0 / 3.0)
+	else if(uvInBounds(leftMinUV, leftMaxUV))
 	{
 		if(leftSide.a != 0.0){
 			color = leftSide;
@@ -41,7 +65,7 @@ void fragment() {
 		}
 	}
 	//Right face
-	else if(v_UV.x >= 2.0 / 3.0 && v_UV.x <= 1.0 && v_UV.y >= 0.0 && v_UV.y < 1.0 / 3.0)
+	else if(uvInBounds(rightMinUV, rightMaxUV))
 	{
 		if(rightSide.a != 0.0){
 			color = rightSide;
@@ -50,7 +74,7 @@ void fragment() {
 		}
 	}
 	//Front face
-	else if(v_UV.x >= 2.0 / 3.0 && v_UV.x <= 1.0 && v_UV.y >= 2.0 / 3.0 && v_UV.y <= 1.0)
+	else if(uvInBounds(frontMinUV, frontMaxUV))
 	{
 		if(frontSide.a != 0.0){
 			color = frontSide;
@@ -59,7 +83,7 @@ void fragment() {
 		}
 	}
 	//Back face
-	else if(v_UV.x >= 0.0 && v_UV.x < 1.0 / 3.0 && v_UV.y >= 0.0 && v_UV.y < 1.0 / 3.0)
+	else if(uvInBounds(backMinUV, backMaxUV))
 	{
 		if(backSide.a != 0.0){
 			color = backSide;
@@ -68,7 +92,7 @@ void fragment() {
 		}
 	}
 	//Bottom face
-	else if(v_UV.x >= 1.0 / 3.0 && v_UV.x < 2.0 / 3.0 && v_UV.y >= 2.0 / 3.0 && v_UV.y <= 1.0)
+	else if(uvInBounds(bottomMinUV, bottomMaxUV))
 	{
 		if(bottomSide.a != 0.0){
 			color = bottomSide;
@@ -79,8 +103,3 @@ void fragment() {
 
     ALBEDO = color.rgb;
 }
-
-//void light() {
-	// Called for every pixel for every light affecting the material.
-	// Uncomment to replace the default light processing function with this one.
-//}
