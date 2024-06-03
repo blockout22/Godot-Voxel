@@ -118,8 +118,11 @@ public partial class VoxelChunk
         instance.Mesh = mesh;
 
         instance.Position = new Vector3(chunk_position.X, chunk_position.Y, chunk_position.Z) * voxelWorld.chunk_size;
-        if (instance.Mesh != null){
-            instance.CreateTrimeshCollision();
+        // 
+        if(instance.Mesh != null){
+            if (instance.Mesh.GetSurfaceCount() > 0){
+                instance.CreateTrimeshCollision();
+            }
         }
 
         checkNeighbors();
