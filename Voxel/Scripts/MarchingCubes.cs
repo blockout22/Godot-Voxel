@@ -1,54 +1,8 @@
 using Godot;
 using System;
-using System.Collections.Generic;
 
 public partial class MarchingCubes
 {
-    // public override void _Ready()
-    // {
-    //     GD.Print("Building");
-    //     int gridSize = 50; // Adjust grid size as needed
-    //     InitializeGrid(gridSize, out float[,,] values, 2, 1);
-    //     GenerateMesh(gridSize, values, 1.0f);
-    // }
-
-private void InitializeGrid(int gridSize, out float[,,] values, float majorRadius, float minorRadius)
-    {
-        values = new float[gridSize, gridSize, gridSize];
-        float minRange = float.MaxValue;
-        float maxRange = float.MinValue;
-
-        Vector3 center = new Vector3(gridSize / 2, gridSize / 2, gridSize / 2);
-
-        for (int x = 0; x < gridSize; x++)
-        {
-            for (int y = 0; y < gridSize; y++)
-            {
-                for (int z = 0; z < gridSize; z++)
-                {
-                    Vector3 pos = new Vector3(x, y, z);
-
-                    float dx = pos.X - center.X;
-                    float dy = pos.Y - center.Y;
-                    float dz = pos.Z - center.Z;
-
-                    float q = Mathf.Sqrt(dx * dx + dy * dy) - majorRadius;
-                    float val = q * q + dz * dz - minorRadius * minorRadius;
-                    values[x, y, z] = val;
-                    if(val < minRange){
-                        minRange = val;
-                    }
-
-                    if(val > maxRange){
-                        maxRange = val;
-                    }
-                }
-            }
-        }
-
-        GD.Print("Range: " + minRange + " - " + maxRange);
-    }
-
     public static Mesh GenerateMesh(int gridSize, float[,,] values, float isolevel)
     {
         var vertices = new Godot.Collections.Array<Vector3>();
@@ -92,51 +46,54 @@ private void InitializeGrid(int gridSize, out float[,,] values, float majorRadiu
                     cubeIndex = GetCubeIndex(cubeValues, isolevel);
 
                     // Find the vertices where the surface intersects the cube
-                    if (edgeTable[cubeIndex] != 0)
+                    if (edgeTable[cubeIndex] == 0)
                     {
-                        if ((edgeTable[cubeIndex] & 1) != 0)
-                            vertList[0] = VertexInterp(isolevel, cubeCorners[0], cubeCorners[1], cubeValues[0], cubeValues[1]);
-                        if ((edgeTable[cubeIndex] & 2) != 0)
-                            vertList[1] = VertexInterp(isolevel, cubeCorners[1], cubeCorners[2], cubeValues[1], cubeValues[2]);
-                        if ((edgeTable[cubeIndex] & 4) != 0)
-                            vertList[2] = VertexInterp(isolevel, cubeCorners[2], cubeCorners[3], cubeValues[2], cubeValues[3]);
-                        if ((edgeTable[cubeIndex] & 8) != 0)
-                            vertList[3] = VertexInterp(isolevel, cubeCorners[3], cubeCorners[0], cubeValues[3], cubeValues[0]);
-                        if ((edgeTable[cubeIndex] & 16) != 0)
-                            vertList[4] = VertexInterp(isolevel, cubeCorners[4], cubeCorners[5], cubeValues[4], cubeValues[5]);
-                        if ((edgeTable[cubeIndex] & 32) != 0)
-                            vertList[5] = VertexInterp(isolevel, cubeCorners[5], cubeCorners[6], cubeValues[5], cubeValues[6]);
-                        if ((edgeTable[cubeIndex] & 64) != 0)
-                            vertList[6] = VertexInterp(isolevel, cubeCorners[6], cubeCorners[7], cubeValues[6], cubeValues[7]);
-                        if ((edgeTable[cubeIndex] & 128) != 0)
-                            vertList[7] = VertexInterp(isolevel, cubeCorners[7], cubeCorners[4], cubeValues[7], cubeValues[4]);
-                        if ((edgeTable[cubeIndex] & 256) != 0)
-                            vertList[8] = VertexInterp(isolevel, cubeCorners[0], cubeCorners[4], cubeValues[0], cubeValues[4]);
-                        if ((edgeTable[cubeIndex] & 512) != 0)
-                            vertList[9] = VertexInterp(isolevel, cubeCorners[1], cubeCorners[5], cubeValues[1], cubeValues[5]);
-                        if ((edgeTable[cubeIndex] & 1024) != 0)
-                            vertList[10] = VertexInterp(isolevel, cubeCorners[2], cubeCorners[6], cubeValues[2], cubeValues[6]);
-                        if ((edgeTable[cubeIndex] & 2048) != 0)
-                            vertList[11] = VertexInterp(isolevel, cubeCorners[3], cubeCorners[7], cubeValues[3], cubeValues[7]);
-
-                        // Add the triangles
-                        for (int i = 0; triTable[cubeIndex, i] != -1; i += 3)
-                        {
-                            Vector3 v0 = vertList[triTable[cubeIndex, i]];
-                            Vector3 v1 = vertList[triTable[cubeIndex, i + 1]];
-                            Vector3 v2 = vertList[triTable[cubeIndex, i + 2]];
-
-                            // Ensure the vertices are added in clockwise order
-                            st.AddVertex(v0);
-                            st.AddVertex(v2);
-                            st.AddVertex(v1);
-                        }
+                        continue;
                     }
+                    if ((edgeTable[cubeIndex] & 1) != 0)
+                        vertList[0] = VertexInterp(isolevel, cubeCorners[0], cubeCorners[1], cubeValues[0], cubeValues[1]);
+                    if ((edgeTable[cubeIndex] & 2) != 0)
+                        vertList[1] = VertexInterp(isolevel, cubeCorners[1], cubeCorners[2], cubeValues[1], cubeValues[2]);
+                    if ((edgeTable[cubeIndex] & 4) != 0)
+                        vertList[2] = VertexInterp(isolevel, cubeCorners[2], cubeCorners[3], cubeValues[2], cubeValues[3]);
+                    if ((edgeTable[cubeIndex] & 8) != 0)
+                        vertList[3] = VertexInterp(isolevel, cubeCorners[3], cubeCorners[0], cubeValues[3], cubeValues[0]);
+                    if ((edgeTable[cubeIndex] & 16) != 0)
+                        vertList[4] = VertexInterp(isolevel, cubeCorners[4], cubeCorners[5], cubeValues[4], cubeValues[5]);
+                    if ((edgeTable[cubeIndex] & 32) != 0)
+                        vertList[5] = VertexInterp(isolevel, cubeCorners[5], cubeCorners[6], cubeValues[5], cubeValues[6]);
+                    if ((edgeTable[cubeIndex] & 64) != 0)
+                        vertList[6] = VertexInterp(isolevel, cubeCorners[6], cubeCorners[7], cubeValues[6], cubeValues[7]);
+                    if ((edgeTable[cubeIndex] & 128) != 0)
+                        vertList[7] = VertexInterp(isolevel, cubeCorners[7], cubeCorners[4], cubeValues[7], cubeValues[4]);
+                    if ((edgeTable[cubeIndex] & 256) != 0)
+                        vertList[8] = VertexInterp(isolevel, cubeCorners[0], cubeCorners[4], cubeValues[0], cubeValues[4]);
+                    if ((edgeTable[cubeIndex] & 512) != 0)
+                        vertList[9] = VertexInterp(isolevel, cubeCorners[1], cubeCorners[5], cubeValues[1], cubeValues[5]);
+                    if ((edgeTable[cubeIndex] & 1024) != 0)
+                        vertList[10] = VertexInterp(isolevel, cubeCorners[2], cubeCorners[6], cubeValues[2], cubeValues[6]);
+                    if ((edgeTable[cubeIndex] & 2048) != 0)
+                        vertList[11] = VertexInterp(isolevel, cubeCorners[3], cubeCorners[7], cubeValues[3], cubeValues[7]);
+
+                    // Add the triangles
+                    for (int i = 0; triTable[cubeIndex, i] != -1; i += 3)
+                    {
+                        Vector3 v0 = vertList[triTable[cubeIndex, i]];
+                        Vector3 v1 = vertList[triTable[cubeIndex, i + 1]];
+                        Vector3 v2 = vertList[triTable[cubeIndex, i + 2]];
+
+                        // Ensure the vertices are added in clockwise order
+                        st.AddVertex(v0);
+                        st.AddVertex(v2);
+                        st.AddVertex(v1);
+                    }
+                    
                 }
             }
         }
 
         st.GenerateNormals();
+        // st.Index();
         var mesh = st.Commit();
 
         return mesh;
@@ -158,12 +115,6 @@ private void InitializeGrid(int gridSize, out float[,,] values, float majorRadiu
             p1.Z + mu * (p2.Z - p1.Z)
         );
     }
-
-    private static readonly int[,] edgeToVertex = new int[12, 2] {
-        {0, 1}, {1, 2}, {2, 3}, {3, 0}, 
-        {4, 5}, {5, 6}, {6, 7}, {7, 4}, 
-        {0, 4}, {1, 5}, {2, 6}, {3, 7}
-    };
 
     private static int GetCubeIndex(float[] cube, float isoLevel)
     {
@@ -455,11 +406,6 @@ private void InitializeGrid(int gridSize, out float[,,] values, float majorRadiu
     {0, 9, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
     {0, 3, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
     {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-    };
-
-    static readonly int[,] vertexOffset = new int[8, 3] {
-        { 0, 0, 0 }, { 1, 0, 0 }, { 1, 1, 0 }, { 0, 1, 0 },
-        { 0, 0, 1 }, { 1, 0, 1 }, { 1, 1, 1 }, { 0, 1, 1 }
     };
 }
 

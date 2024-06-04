@@ -122,9 +122,32 @@ public partial class VoxelBuilder
         voxelWorld = _voxelWorld;
         // Vector3 direction = CalculateDirection(1);
         // GD.Print(direction);
+    }   
+
+    private float GetBoundaryValueWithBitmask(int bitmask)
+    {
+        int count = 0;
+        float value = 0f;
+
+        // Iterate through all possible neighbors
+        for (int i = 0; i < 27; i++)
+        {
+            if (i == 13) continue; // Skip the center point
+            if ((bitmask & (1 << i)) != 0)
+            {
+                value += -1f; // Neighbor is present
+            }
+            else
+            {
+                value += 1.0f; // Neighbor is absent
+            }
+            count++;
+        }
+
+        return value / count;
     }
 
-    public Mesh build(VoxelChunk chunk, LOD lod){
+    public Mesh build(VoxelChunk chunk, LOD lod, bool drawSmooth){
         VoxelBlock[,,] blockList = chunk.blockList;
         surfaces.Clear();
         // surfaceTool = new SurfaceTool();
@@ -133,14 +156,15 @@ public partial class VoxelBuilder
 
         int lodScale = (int)lod;
 
+        
         for (int x = 0; x < blockList.GetLength(0); x += lodScale){
             for (int y = 0; y < blockList.GetLength(1); y += lodScale){
                 for (int z = 0; z < blockList.GetLength(2); z += lodScale){
                     VoxelBlock block = blockList[x, y, z];
+                    int neighbors = getNeighbors(chunk, x, y, z);           
                     if (block != null){
                         block.parentChunk = chunk;
                         block.localPosition = new Vector3I(x, y, z);
-                        int neighbors = getNeighbors(chunk, x, y, z);           
                         switch(lod){
                             case LOD.LOW:
                                 break;
@@ -151,9 +175,62 @@ public partial class VoxelBuilder
                                 drawFromMask(block, neighbors, x, y, z, lodScale, DefaultTopUVs, DefaultBottomUVs, DefaultFrontUVs, DefaultBackUVs, DefaultLeftUVs, DefaultRightUVs, chunk);
                                 break;
                         }
+
+                        chunk.scalarField[x, y, z] = -1f;
                         
+                    }else{
+                        chunk.scalarField[x, y, z] = 1.0f;
                     }
                 }
+            }
+        }
+
+        if(drawSmooth){
+            for (int x = 0; x <= voxelWorld.chunk_size; x++)
+            {
+                for (int y = 0; y <= voxelWorld.chunk_size; y++)
+                {
+                    for (int z = 0; z <= voxelWorld.chunk_size; z++)
+                    {
+                        if (x == voxelWorld.chunk_size || y == voxelWorld.chunk_size || z == voxelWorld.chunk_size)
+                        {
+                            if (x == voxelWorld.chunk_size) {
+                                chunk.scalarField[x, y, z] = chunk.scalarField[x - 1, y, z];
+                                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk.chunk_position.X + 1, chunk.chunk_position.Y, chunk.chunk_position.Z);
+                                if(neighborChunk != null){
+                                    chunk.scalarField[x, y, z] = neighborChunk.scalarField[0, y, z];
+                                }else{
+                                    chunk.scalarField[x, y, z] = chunk.scalarField[x - 1, y, z];
+                                }
+                            }
+                            if (y == voxelWorld.chunk_size) {
+                                // chunk.scalarField[x, y, z] = chunk.scalarField[x, y - 1, z];
+                                chunk.scalarField[x, y, z] = chunk.scalarField[x, y - 1, z];
+                                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk.chunk_position.X, chunk.chunk_position.Y + 1, chunk.chunk_position.Z);
+                                if(neighborChunk != null){
+                                    chunk.scalarField[x, y, z] = neighborChunk.scalarField[x, 0, z];
+                                }else{
+                                    chunk.scalarField[x, y, z] = chunk.scalarField[x, y - 1, z];
+                                }
+                            }
+                            if (z == voxelWorld.chunk_size) {
+                                // chunk.scalarField[x, y, z] = chunk.scalarField[x, y, z - 1];
+                                chunk.scalarField[x, y, z] = chunk.scalarField[x, y, z - 1];
+                                VoxelChunk neighborChunk = voxelWorld.getVoxelChunkAtGrid(chunk.chunk_position.X, chunk.chunk_position.Y, chunk.chunk_position.Z + 1);
+                                if(neighborChunk != null){
+                                    chunk.scalarField[x, y, z] = neighborChunk.scalarField[x, y, 0];
+                                }else{
+                                    chunk.scalarField[x, y, z] = chunk.scalarField[x, y, z - 1];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Mesh march = MarchingCubes.GenerateMesh(voxelWorld.chunk_size + 1, chunk.scalarField, 0.0f);
+            if(march != null){
+                return march;
             }
         }
 

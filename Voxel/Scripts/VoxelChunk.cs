@@ -15,6 +15,8 @@ public partial class VoxelChunk
 
     VoxelBuilder builder;
 
+    public float[,,] scalarField;
+
     private bool neighborChunkLeft = false;
     private bool neighborChunkDown = false;
     private bool neighborChunkBack = false;
@@ -27,6 +29,7 @@ public partial class VoxelChunk
         this.chunk_position = _grid_position;
         blockList = new VoxelBlock[voxelWorld.chunk_size, voxelWorld.chunk_size, voxelWorld.chunk_size];
         builder = new VoxelBuilder(voxelWorld);
+        scalarField = new float[voxelWorld.chunk_size + 1, voxelWorld.chunk_size + 1, voxelWorld.chunk_size + 1];
     }
 
     public void generate(VoxelGenerator voxelGenerator){
@@ -101,7 +104,7 @@ public partial class VoxelChunk
     }
 
     public MeshInstance3D buildMesh(VoxelBuilder.LOD lod){
-        Mesh mesh = builder.build(this, lod);
+        Mesh mesh = builder.build(this, lod, true);
 
         if(instance == null){
             instance = new MeshInstance3D();
