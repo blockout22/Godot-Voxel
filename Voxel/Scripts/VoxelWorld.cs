@@ -52,6 +52,7 @@ public partial class VoxelWorld : Node
     public override void _Ready()
     {
         base._Ready();
+		// GetTree().DebugCollisionsHint = true;
 
 		// createAtlas();
 
@@ -106,6 +107,21 @@ public partial class VoxelWorld : Node
 		// create_chunk(new Vector3I(1, -1,  0));
 		// getVoxelChunkAtGrid(1, -1,  0);
     }
+
+	public override void _Input(InputEvent @event)
+    {
+		if(@event is InputEventKey keyEvent){
+			if(keyEvent.Pressed){
+				if(keyEvent.Keycode == Key.F2){
+					GD.Print("F2");
+					foreach(var chunk in chunks){
+						GD.Print("Reloading Chunk at: " + chunk.Key);
+						regenChunk(chunk.Value);
+					}
+				}
+			}
+		}
+	}
 
 	private async void initialGeneration(){
 		Vector3I grid_position = new Vector3I(0, 0, 0);
